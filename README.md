@@ -1,2 +1,2 @@
 # P2_GOBOAT
-Vores køre p2-projekt
+Vores kære p2-projekt

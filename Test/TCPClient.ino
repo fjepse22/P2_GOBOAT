@@ -6,13 +6,15 @@
 
 dht11 DHT11;
 
-//segmentation 
-
 const char* ssid = "Linksys00339";//put your wifi ssid here
 const char* password = "GoBoat33";//put your wifi password here.
-const char* serverAddress = "192.168.1.10"; // TCP Server's IP ADDRESS
+const char* serverAddress = "192.168.1.140"; // TCP Server's IP ADDRESS Raspberry Pi IP: 192.168.1.10
 const int serverPort = 8888; //server's port 
-//char* payload = "111112222211111222221111122222111112";
+int RandNumber;
+int TempTest = 25;
+String UID = "ESP32";
+String Payload;
+
 
 WiFiClient TCPclient;
 void setup_wifi() { //Connect to wifi. While loop breaks when connected.
@@ -33,13 +35,17 @@ void setup() {
 }
 
 void loop() { //Loop function is mandatory even if it is not used.
-  setup_TCP(); // Runs setup_TCP function.
   delay(2000); // Time specified in milliseconds.
+  setup_TCP(); // Runs setup_TCP function.
 
-  int chk = DHT11.read(DHT11PIN);
-  char temp = DHT11.temperature;
-  TCPclient.write(byte(temp));
+  int chk = DHT11.read(DHT11PIN); //Reads information from pin.
+  char Temp = DHT11.temperature;
 
-  Serial.print("payload sent - ");
-  Serial.println(byte(temp));
+  RandNumber = random(100); // Random number from 0 to 100.
+  Payload = UID +","+ String(RandNumber) +","+ String(byte(Temp)); // combines UID, RandNumber and Temperture.
+  
+  TCPclient.write(Payload.c_str()); // sends the Payload
+  Serial.print("Payload sent - "); // prints the Payload
+  Serial.println(Payload.c_str()); 
+
 }

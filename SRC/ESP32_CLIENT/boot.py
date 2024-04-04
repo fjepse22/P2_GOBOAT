@@ -1,5 +1,6 @@
 # boot.py -- run on boot-up
 from socket import *
+import network 
 """
 MicroPython code for ESP32.
 Connects to WifI and sends a simple message.
@@ -9,7 +10,6 @@ def connect_to_wifi(): #forbindelse til WiFi.
 """
 Function makes it possible to connect ESP32 to WiFi.
 """
-    import network 
     ssid = "Linksys00339" #Network's name.
     key="GoBoat33" #Network's passcode.
     wlan = network.WLAN(network.STA_IF)

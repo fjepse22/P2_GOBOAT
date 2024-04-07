@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!-- 	
+		XML for Status data type 2
+		Version 1.0 | Encoding: UTF-8
+		Created by: Maiken Hammer
+		Date: 28/03-2024
+		Modified by: -None-
+		Date: -None-
+-->
+
+<statusDataType2 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="statusDataType2Sch.xsd">
+	<boatData>
+		<ID>1</ID>
+		<PositionLat>33</PositionLat>
+		<PositionLon>-144</PositionLon>
+		<Time>14:02:46</Time>
+	</boatData>
+	<battData>
+		<Battery1>
+			<Voltage>12</Voltage>
+		</Battery1>
+		<Battery2>
+			<Voltage>12</Voltage>
+		</Battery2>
+		<Battery3>
+			<Voltage>12</Voltage>
+		</Battery3>
+		<Battery4>
+			<Voltage>12</Voltage>
+		</Battery4>
+		<Draw>2.3</Draw>
+	</battData>
+</statusDataType2>

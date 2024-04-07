@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!-- 	
+		XML for Status data type 3
+		Version 1.0 | Encoding: UTF-8
+		Created by: Maiken Hammer
+		Date: 28/03-2024
+		Modified by: -None-
+		Date: -None-
+-->
+
+<statusDataType3 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="statusDataType3Sch.xsd">
+	<boatData>
+		<ID>1</ID>
+		<PositionLat>33</PositionLat>
+		<PositionLon>-144</PositionLon>
+		<Time>14:02:46</Time>
+	</boatData>
+</statusDataType3>

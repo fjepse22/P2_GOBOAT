@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 	
+		XSD for Status data type 2
+		Version 1.0 | Encoding: UTF-8
+		Created by: Jesper Hammer
+		Date: 28/03-2024
+		Modified by: -None-
+		Date: -None-
+-->
+
+<!--Main data struct declaretion-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="statusDataType2">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="boatData" type="boatDataStruct"/>
+				<xs:element name="battData" type="battDataStruct"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+<!--Boat data struct declaration-->
+
+	<xs:complexType name="boatDataStruct">
+		<xs:sequence>
+			<xs:element name="ID">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:maxInclusive value="99999999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PositionLat">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:minInclusive value="-90"/>
+						<xs:maxInclusive value="90"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PositionLon">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:minInclusive value="-180"/>
+						<xs:maxInclusive value="180"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Time" type="xs:time"/>
+		</xs:sequence>
+	</xs:complexType>
+
+<!--Battery data struct declaration-->
+	
+	<xs:complexType name="battDataStruct">
+		<xs:sequence>
+			<xs:element name="Battery1" type="voltageDataStruct"/>
+			<xs:element name="Battery2" type="voltageDataStruct"/>
+			<xs:element name="Battery3" type="voltageDataStruct"/>
+			<xs:element name="Battery4" type="voltageDataStruct"/>
+			<xs:element name="Draw">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:maxInclusive value="10"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+<!--Voltage data struct declaration-->
+
+	<xs:complexType name="voltageDataStruct">
+		<xs:sequence>
+			<xs:element name="Voltage">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:maxInclusive value="15"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

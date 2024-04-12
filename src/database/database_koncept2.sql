@@ -1,10 +1,12 @@
-DROP DATABASE if EXISTS Goboat;
-create DATABASE Goboat;
--- version 0.x
+CREATE DATABASE Goboat;
+-- version 1.0
 -- Writen by: Frederik B. B. Jepsen
+-- created: 12-04-2024
+-- last modified:
+-- Last Modified by:
 
+-- This file creates the GoBOAT database with all the tables and restrictions.
 
--- This parts creates all the table of the database
 
 -- Table with the boats
 -- all bateries have a unique ID which is the serial number of the battery

@@ -1,22 +1,43 @@
+#Version 0.10 | Encoding UTF-8
+#Created by: Ib Leminen Mohr Nielsen
+#Date: 13-4-2024    
+
 import xml.etree.ElementTree as ET
 from datetime import datetime
-"""
-This code is made for parsing XML files from ESP32 devices on GoBoat.
-"""
-class xml_parser:
+class XmlParser:
+    """
+    The class XmlParser is used to read an XML file and extract data from it. The data is stored in the class variables.\n 
+
+    List of class methods:\n
+    - get_voltage(): Looks for every battery in the xml-file and reads the voltage from it, and appends it to self.voltage_list\n
+
+    - get_time(): b: Looks for time sent from the xml file and adds the current date to it.\n
+
+    - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
+    """
+
     def __init__(self):
         self.root = ET.fromstring(open('status_data_8batt.xml').read()) #Reads the XML file and stores it in root.
-        self.Voltage_Array = []#Based on Draw from xml.
-        self.Boat_ID = str("")  #Uniqe ID for each boat.
+        self.voltage_list = []#Based on Draw from xml.
+        self.boat_id = str("")  #Uniqe ID for each boat.
         self.lok_lat = int(0)  #Latitude used to locate the boat.
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
+        self.watt_hour = int(0)
 
     def get_voltage(self):
         """
-        Finds the battery tags in the XML file and reads the voltage for each battery. The voltages are stored in self.Voltage_Array
-
-        Returns Array with voltages and number of batteries.
+        Looks for every battery in the xml-file and reads the voltage from it, and appends it to self.voltage_list\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "self.voltage_list"\n
+        Return type is list. List element type is FLOAT\n
         """
       
         i=0
@@ -27,39 +48,64 @@ class xml_parser:
                 break
 
             for data in self.root.findall(Battery_number):  #Looks for specific battery in xml file, for instance Battery1
-                self.Voltage_Array.append(data.find(".//Voltage").text) #Writes the voltage into the array in the index of i)  #Adds a new index to the array
+                self.voltage_list.append(data.find(".//Voltage").text) #appends the value of voltage to self.voltage_list.
                 i+=1  
                 
-        return self.Voltage_Array
+        return self.voltage_list
     
     
     def get_time(self):
         """
-        Adds the year, month and day to the time from the XML file.
-
-        Returns the time in yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46
+        Looks for time sent from the xml file and adds the current date to it.\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "self.date"\n
+        Return type is string. The string is in yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46\n
         """
       
         local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
-        Time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
-        self.date=local_time+" "+Time  
+        time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
+        self.date=local_time+" "+time  
 
         return self.date
 
     def get_std_data(self):
         """
-        Looks for the rest of the more simple data. 
+        Looks for the rest of the more simple data and adds it to variables.\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "self.watt_hour"\n
+        Return type is string. The string is the value of Draw in the XML file.\n
 
-        Returns Amperage, Boat_ID, lok_lat and lok_long.
+        Returns "self.boat_id"\n
+        Return type is string. The string is the ID of the boat.\n
+
+        Returns "self.lok_lat"\n
+        Return type is string. The string is the latitude of the boat.\n
+
+        Returns "self.lok_long"\n
+        Return type is string. The string is the longitude of the boat.\n
         """
-        self.WH = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file.
-        self.Boat_ID = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
+        self.watt_hour = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt hour.
+        self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
         self.lok_lat = self.root.find(".//boatData/PositionLat").text  #Looks for PositionLat in XML file.
         self.lok_long = self.root.find(".//boatData/PositionLon").text  #Looks for PositionLon in XML file.
 
-        return self.WH, self.Boat_ID, self.lok_lat, self.lok_long
+        return self.watt_hour, self.boat_id, self.lok_lat, self.lok_long
         
-xml_parser=xml_parser()
+xml_parser=XmlParser()
 xml_parser.get_voltage()
 xml_parser.get_time()
 xml_parser.get_std_data()

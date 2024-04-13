@@ -1,6 +1,8 @@
 #Version 0.10 | Encoding UTF-8
+#Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
-#Date: 13-4-2024    
+# Last modified by: Frederik B. B. Jepsen
+# Last modified 13-04-2024
 
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -14,6 +16,8 @@ class XmlParser:
     - get_time(): b: Looks for time sent from the xml file and adds the current date to it.\n
 
     - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
+
+    - get_all_data(): call the methods get_voltage(), get_time() and get_std_data()
     """
 
     def __init__(self):
@@ -24,6 +28,18 @@ class XmlParser:
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.watt_hour = int(0)    #Watt hour used for power draw.
+
+
+    def __str__(self) -> str:
+        return(f"""
+        Voltage for battery {self.voltage_list}
+        Boat ID = {self.boat_id}
+        Lattitude = {self.lok_lat}
+        Longitude = {self.lok_long}
+        Event time = {self.date}
+        What hour = {self.watt_hour}
+        """)
+
 
     def get_voltage(self):
         """
@@ -104,8 +120,29 @@ class XmlParser:
         self.lok_long = self.root.find(".//boatData/PositionLon").text  #Looks for PositionLon in XML file.
 
         return self.watt_hour, self.boat_id, self.lok_lat, self.lok_long
+    
+    def get_all_data(self):
+        """
+        get_all_data(self)
+
+        This method call get_voltage(),get_time() and get_std_data()
+        This ensures all the data from the xml-file is extracted by one method call.
+
+        """
+
+
+        self.get_voltage()
+        self.get_time()
+        self.get_std_data()
         
-xml_parser=XmlParser()
-xml_parser.get_voltage()
-xml_parser.get_time()
-xml_parser.get_std_data()
+
+
+
+if __name__ == '__main__':
+    xml_parser= XmlParser()
+   # xml_parser.get_voltage()
+   # xml_parser.get_time()
+   # xml_parser.get_std_data()
+    xml_parser.get_all_data()
+
+    print(xml_parser)

@@ -18,12 +18,12 @@ class XmlParser:
 
     def __init__(self):
         self.root = ET.fromstring(open('status_data_8batt.xml').read()) #Reads the XML file and stores it in root.
-        self.voltage_list = []#Based on Draw from xml.
+        self.voltage_list = []    #Based on Draw from xml.
         self.boat_id = str("")  #Uniqe ID for each boat.
         self.lok_lat = int(0)  #Latitude used to locate the boat.
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
-        self.watt_hour = int(0)
+        self.watt_hour = int(0)    #Watt hour used for power draw.
 
     def get_voltage(self):
         """

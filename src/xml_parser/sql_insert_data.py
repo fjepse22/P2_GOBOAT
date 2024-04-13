@@ -1,0 +1,162 @@
+# See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
+
+# Writen by Frederik B. B. Jepsen
+# Created 13-04-2024
+# last modified:
+# last modified by:
+
+import mariadb
+import sys
+
+import xml_parser as xml_p
+
+class DatabaseConnection:
+    """
+    DatabaseConnection(user,password,host,port=3306,database=Goboat)
+
+    This class is used to connect to the Goboat database in order to insert battery logs into the Goboat database.
+    The class have the following methods
+    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
+    """
+
+    def __init__(self,user,password,host,port=3306,database='Goboat'):
+
+
+
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+        self.database = database
+
+    def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array):
+        """
+        insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
+
+        This method connects to the Goboat database and insert the data recieved from the xml-file.
+
+        It will only insert the data, if the amount of batteries for the boat correspont to the lentgh of the Voltage_array.
+
+        """
+        try:
+            connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            sys.exit(1)
+        # Get Cursor
+        cursor = connection.cursor()
+
+        # Fetch the battery_ID's
+        cursor.execute(
+            f"""SELECT * FROM Goboat.boats WHERE Boat_ID = '{boat_ID}'""", 
+        )
+        # battery row 1-8 contains the battery, the vallue is null if there is not battery in the place
+        batteries= cursor.fetchone()
+
+
+        batteries = list(batteries)
+
+        for i in range(0,len(batteries)):
+            if type(batteries[i]) != str:
+                batteries[i] = "nobat"
+
+        # The command to insert all data of the boat except the voltage of the battery.
+        insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,Battery_temperature,Watt_hour)
+        VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{Battery_temperature},{Watt_hour});"""
+        
+
+        # this command is used to fine the Data_ID in order to link the data about battery voltage to the rest of the boat data.
+        # it is possible to extract this information before you commit the data, as the Data_ID get reserved for the duration.
+        find_Data_ID = f"""SELECT Data_ID
+        From Goboat.Data_Boat
+        WHERE (Boat_ID='{boat_ID}') AND (Data_time='{Date}'); """
+
+
+        find_batteries =f""" SELECT Battery_ID,Slot_number
+        FROM Goboat.Boats_batteries
+        WHERE (Boat_ID='{boat_ID}');"""
+        
+
+        # fetch the batteri_id for each batteri in the boat.
+        # it returns a list of tubles which is a surprise tool that we will use at later.
+        try:
+            cursor.execute(find_batteries)
+            fetch = cursor.fetchall()
+            print(fetch)
+            batteries = fetch
+            print(batteries)
+        except:
+            print(f'Could not find batteries for the boat with ID {boat_ID}')
+            cursor.close()
+            connection.close()
+            return
+        
+
+        # this check that the amount of batteries on the boat correnspont to the voltage_array data
+        # if that is not the case, no data will be inserted into the Goboat database.
+        if len(batteries) == len(Voltage_array):
+            pass    
+        else:
+            # raise Exception(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
+            print(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
+            print(f'Therefore the data is not logged')
+            cursor.close()
+            connection.close()
+            return
+
+        try:
+            cursor.execute(insert_data)
+                
+        except:
+            print("insert into table Data_boat failed")
+            cursor.close()
+            connection.close()
+            return
+
+        try:
+            cursor.execute(find_Data_ID)
+            fetch = cursor.fetchall()
+            Data_ID = fetch[0][0]
+        except:
+            print(f'select statement failed could not find Data_ID {Data_ID} in table Data_boat')
+            cursor.close()
+            connection.close()
+            return
+
+
+        # This logic insert the data about voltage for each battery
+        # unforfunally it does not work to write the sql statement like this and call the variable.
+        # Therefore this string is copied to the cursor.execute() command
+        insert_voltage_data = f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_voltage)
+        VALUES ('{Data_ID}','{batteries[i][0]}','{Voltage_array[i]}')"""
+
+
+        
+        # Inserts the 
+        try:
+            for i in range(0,len(Voltage_array)):
+                cursor.execute(f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_voltage)
+            VALUES ('{Data_ID}','{batteries[i][0]}','{Voltage_array[i]}')""")
+        except:
+            print("failed to insert data to the voltage table")
+            cursor.close()
+            connection.close()
+            return
+
+
+        # if everything went without errors, the updated values are implementet
+        connection.commit()
+
+        # free resources
+        cursor.close()
+        connection.close()
+
+if __name__ == '__main__':
+
+    # Testserver on Frederik's own computer.
+    Goboat = DatabaseConnection(user="frederik",password="password",host="127.0.0.1")
+    data = xml_p.XmlParser()
+    data.get_all_data()
+
+    Goboat.insert_boat_data(boat_ID=data.boat_id,Date=data.date,Lok_lat=data.lok_lat,Lok_long=data.lok_long,Battery_temperature=55,Watt_hour=data.watt_hour,Voltage_array=data.voltage_list)
+

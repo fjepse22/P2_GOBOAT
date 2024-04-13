@@ -2,8 +2,8 @@ CREATE DATABASE Goboat;
 -- version 1.0
 -- Writen by: Frederik B. B. Jepsen
 -- created: 12-04-2024
--- last modified:
--- Last Modified by:
+-- last modified: 13-04-3024
+-- Last Modified by: Frederik B. B. Jepsen
 
 -- This file creates the GoBOAT database with all the tables and restrictions.
 
@@ -57,7 +57,7 @@ Data_time DATETIME,
 Lok_lat FLOAT,
 Lok_long FLOAT,
 Battery_temperature FLOAT,
-Amperage FLOAT
+Watt_hour FLOAT
 );
 
 

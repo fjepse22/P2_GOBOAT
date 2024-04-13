@@ -1,3 +1,6 @@
+#Version 0.10 | Encoding UTF-8
+#Created by: Ib Leminen Mohr Nielsen
+#Date: 04-04-2024    
 # boot.py -- run on boot-up
 from socket import *
 import network 
@@ -6,11 +9,20 @@ MicroPython code for ESP32.
 Connects to WifI and sends a simple message.
 """
 
-def connect_to_wifi(): #forbindelse til WiFi.
+def connect_to_wifi(): 
     """
-    Function makes it possible to connect ESP32 to WiFi.
+    Makes the ESP32 connect to WiFi.\n
+    \n
+    ------------
+    PARAMETERS\n
+    \n
+    None:\n
+    ------------
+    RETURNS\n
+    \n
+    Returns "None"\n
+    Return type is None.\n
     """
-
     ssid = "Linksys00339" #Network's name.
     key="GoBoat33" #Network's passcode.
     wlan = network.WLAN(network.STA_IF)
@@ -22,19 +34,27 @@ def connect_to_wifi(): #forbindelse til WiFi.
 
 def client_to_server():
     """
-    Connects the client to the server using TCP (socket)
-    Raspberry Pi IP_Adress = 192.168.1.10
-    Make sure to be on same network as server and not eduroam
+    Connects the client to the server using TCP (socket), Make sure to be on same network as server and not eduroam.\n
+    \n
+    ------------
+    PARAMETERS\n
+    \n
+    None:\n
+    ------------
+    RETURNS\n
+    \n
+    Returns "None"\n
+    Return type is None.\n
     """
     
-    server_ip = "192.168.1.140" #The server's IP adress 
+    server_ip = "192.168.1.140" #The server's IP adress, Raspberry Pi IP_Adress = 192.168.1.10
     server_port = 8888 
     buffer_size = 1024 
     message="Hello Group" #The message that gets sent to the server.
     payload=message
     sock = socket(AF_INET,SOCK_STREAM)
     sock.connect((server_ip, server_port)) #Establishes connection to server.
-    sock.send(bytes(payload,'utf-8')) #Sends the payload in bytes formatted in utd-8
+    sock.send(bytes(payload,'utf-8')) #Sends the payload in bytes formatted in utf-8
 
 
 #running the functions.

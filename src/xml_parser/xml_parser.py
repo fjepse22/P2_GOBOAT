@@ -1,8 +1,9 @@
-#Version 0.10 | Encoding UTF-8
+#Version 0.12 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
-# Last modified by: Frederik B. B. Jepsen
-# Last modified 13-04-2024
+#Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
+#Last modified 15-04-2024
+
 
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -16,34 +17,32 @@ class XmlParser:
     - get_time(): b: Looks for time sent from the xml file and adds the current date to it.\n
 
     - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
-
-    - get_all_data(): call the methods get_voltage(), get_time() and get_std_data()
     """
 
     def __init__(self):
-        self.root = ET.fromstring(open('status_data_8batt.xml').read()) #Reads the XML file and stores it in root.
-        self.voltage_list = []    #Based on Draw from xml.
-        self.boat_id = str("")  #Uniqe ID for each boat.
+        self.root = ET.fromstring(open('status_data.xml').read()) #Reads the XML file and stores it in root.
+        self.voltage_list = []  #Voltage from each battery.
+        self.temp_list = []  #Temperature of each battery.
+        self.watt_hour = int(0) #Based on Draw from xml.
         self.lok_lat = int(0)  #Latitude used to locate the boat.
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
-        self.watt_hour = int(0)    #Watt hour used for power draw.
-
+        self.boat_id = str("")  #Uniqe ID for each boat.
 
     def __str__(self) -> str:
         return(f"""
         Voltage for battery {self.voltage_list}
+        Temperature for battery {self.temp_list}
         Boat ID = {self.boat_id}
         Lattitude = {self.lok_lat}
         Longitude = {self.lok_long}
         Event time = {self.date}
         What hour = {self.watt_hour}
         """)
-
-
-    def get_voltage(self):
+        
+    def get_volt_temp(self):
         """
-        Looks for every battery in the xml-file and reads the voltage from it, and appends it to self.voltage_list\n
+        Looks for every battery in the xml-file and reads the voltage and temperature from it, and appends it to self.voltage_list and self.temp_list\n
         \n
         ------------
         PARAMETERS\n
@@ -53,6 +52,9 @@ class XmlParser:
         RETURNS\n
         \n
         Returns "self.voltage_list"\n
+        Return type is list. List element type is FLOAT\n
+
+        Returns "self.temp_list"\n
         Return type is list. List element type is FLOAT\n
         """
       
@@ -64,10 +66,11 @@ class XmlParser:
                 break
 
             for data in self.root.findall(Battery_number):  #Looks for specific battery in xml file, for instance Battery1
-                self.voltage_list.append(data.find(".//Voltage").text) #appends the value of voltage to self.voltage_list.
+                self.voltage_list.append(data.find(".//Voltage").text) #Appends the value of voltage to self.voltage_list.
+                self.temp_list.append(data.find(".//Temperature").text ) #Appends the value of temperature in celsius to self.temp_list.
                 i+=1  
                 
-        return self.voltage_list
+        return self.voltage_list, self.temp_list
     
     
     def get_time(self):
@@ -123,21 +126,24 @@ class XmlParser:
     
     def get_all_data(self):
         """
-        get_all_data(self)
-
-        This method call get_voltage(),get_time() and get_std_data()
-        This ensures all the data from the xml-file is extracted by one method call.
-
+        Collects all data from the xml-file in a single method.\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
         """
 
-
-        self.get_voltage()
+        self.get_volt_temp()
         self.get_time()
         self.get_std_data()
         
-
-
-
+        
 if __name__ == '__main__':
     xml_parser= XmlParser()
    # xml_parser.get_voltage()

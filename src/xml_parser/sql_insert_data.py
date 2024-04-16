@@ -2,8 +2,8 @@
 
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified:
-# last modified by:
+# last modified: 16-04-2024
+# last modified by: Frederik Jepsen
 
 # TESTER PULL REQUEST
 
@@ -31,9 +31,9 @@ class DatabaseConnection:
         self.port = port
         self.database = database
 
-    def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array):
+    def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,Watt_hour,Voltage_array):
         """
-        insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
+        insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,Watt_hour,Voltage_array)
 
         This method connects to the Goboat database and insert the data recieved from the xml-file.
 
@@ -63,8 +63,8 @@ class DatabaseConnection:
                 batteries[i] = "nobat"
 
         # The command to insert all data of the boat except the voltage of the battery.
-        insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,Battery_temperature,Watt_hour)
-        VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{Battery_temperature},{Watt_hour});"""
+        insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,Watt_hour)
+        VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{Watt_hour});"""
         
 
         # this command is used to fine the Data_ID in order to link the data about battery voltage to the rest of the boat data.
@@ -84,9 +84,7 @@ class DatabaseConnection:
         try:
             cursor.execute(find_batteries)
             fetch = cursor.fetchall()
-            print(fetch)
             batteries = fetch
-            print(batteries)
         except:
             print(f'Could not find batteries for the boat with ID {boat_ID}')
             cursor.close()
@@ -127,18 +125,14 @@ class DatabaseConnection:
 
 
         # This logic insert the data about voltage for each battery
-        # unforfunally it does not work to write the sql statement like this and call the variable.
+        # unforfunally it does not work to write the sql statement as a variable and call that varible in the cursor.execute command.
         # Therefore this string is copied to the cursor.execute() command
-        insert_voltage_data = f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_voltage)
-        VALUES ('{Data_ID}','{batteries[i][0]}','{Voltage_array[i]}')"""
-
-
         
         # Inserts the 
         try:
             for i in range(0,len(Voltage_array)):
-                cursor.execute(f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_voltage)
-            VALUES ('{Data_ID}','{batteries[i][0]}','{Voltage_array[i]}')""")
+                cursor.execute(f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_temperature,Battery_voltage)
+            VALUES ('{Data_ID}','{batteries[i][0]}','{Battery_temperatures[i]}','{Voltage_array[i]}');""")
         except:
             print("failed to insert data to the voltage table")
             cursor.close()
@@ -160,5 +154,5 @@ if __name__ == '__main__':
     data = xml_p.XmlParser()
     data.get_all_data()
 
-    Goboat.insert_boat_data(boat_ID=data.boat_id,Date=data.date,Lok_lat=data.lok_lat,Lok_long=data.lok_long,Battery_temperature=55,Watt_hour=data.watt_hour,Voltage_array=data.voltage_list)
+    Goboat.insert_boat_data(boat_ID=data.boat_id,Date=data.date,Lok_lat=data.lok_lat,Lok_long=data.lok_long,Battery_temperatures=data.temp_list,Watt_hour=data.watt_hour,Voltage_array=data.voltage_list)
 

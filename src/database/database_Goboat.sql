@@ -56,7 +56,6 @@ Boat_ID  char(8),
 Data_time DATETIME,
 Lok_lat FLOAT,
 Lok_long FLOAT,
-Battery_temperature FLOAT,
 Watt_hour FLOAT
 );
 
@@ -66,6 +65,7 @@ CREATE TABLE Goboat.Voltage(
 Row_ID INT PRIMARY KEY AUTO_INCREMENT,
 Data_ID INT,
 Battery_ID CHAR(8),
+Battery_temperature FLOAT,
 Battery_voltage FLOAT
 );
 

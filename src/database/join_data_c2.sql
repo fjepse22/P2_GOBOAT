@@ -6,4 +6,4 @@ USE Goboat;
 
 SELECT * FROM Goboat.Data_boat
 INNER JOIN Voltage ON Goboat.data_boat.Data_ID=Goboat.voltage.Data_ID
--- WHERE (data_boat.Boat_ID='boat1');
+WHERE (data_boat.Boat_ID='boat2' AND data_boat.Data_ID='10');

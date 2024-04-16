@@ -92,5 +92,3 @@ VALUES
 ('bat33','boat3',3),
 ('bat34','boat3',4)
 ;
-
-

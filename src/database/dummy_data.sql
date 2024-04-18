@@ -103,7 +103,7 @@ VALUES
 ('bat28','boat2',8)
 ;
 
-INSERT INTO Goboat.boats_batteries (Battery_ID,Boat_ID,Slot_number)
+INSERT INTO Goboat.Boats_batteries (Battery_ID,Boat_ID,Slot_number)
 VALUES
 ('bat31','boat3',1),
 ('bat32','boat3',2),

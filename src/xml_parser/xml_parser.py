@@ -1,11 +1,12 @@
-#Version 0.12 | Encoding UTF-8
-#Created 13-04-2024
+#Version 0.13 | Encoding UTF-8
+#Created 18-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
 #Last modified 15-04-2024
 
 
 import xml.etree.ElementTree as ET
+import logging
 from datetime import datetime
 class XmlParser:
     """
@@ -20,7 +21,8 @@ class XmlParser:
     """
 
     def __init__(self):
-        self.root = ET.fromstring(open('status_data.xml').read()) #Reads the XML file and stores it in root.
+        self.logger = logging.getLogger(__name__)
+        self.logging=logging.basicConfig(filename='xml_parser_error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
         self.watt_hour = int(0) #Based on Draw from xml.
@@ -28,18 +30,31 @@ class XmlParser:
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-
-    def __str__(self) -> str:
-        return(f"""
-        Voltage for battery {self.voltage_list}
-        Temperature for battery {self.temp_list}
-        Boat ID = {self.boat_id}
-        Lattitude = {self.lok_lat}
-        Longitude = {self.lok_long}
-        Event time = {self.date}
-        What hour = {self.watt_hour}
-        """)
-        
+    
+    def read_xml(self):
+        """
+        Reads the XML file and stores it in self.root\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "self.root"\n
+        Return type is ElementTree\n
+        """
+        try:
+            self.root = ET.fromstring(open('status_data.xml').read()) #Reads the XML file and stores it in root.
+        except FileNotFoundError:
+            self.logger.error("The file status_data.xml does not exist")
+            exit(1)
+        except ET.ParseError:
+            self.logger.error("The file is not valid XML")
+            exit(1)
+        return self.root
+            
     def get_volt_temp(self):
         """
         Looks for every battery in the xml-file and reads the voltage and temperature from it, and appends it to self.voltage_list and self.temp_list\n
@@ -57,8 +72,9 @@ class XmlParser:
         Returns "self.temp_list"\n
         Return type is list. List element type is FLOAT\n
         """
-      
+        
         i=0
+        self.read_xml()
         while True:
             Battery_number=(".//Battery"+str(i+1))  #Increment Battery number to get the right name/root.
 
@@ -87,7 +103,8 @@ class XmlParser:
         Returns "self.date"\n
         Return type is string. The string is in yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46\n
         """
-      
+        self.read_xml()
+        
         local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
         time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
         self.date=local_time+" "+time  
@@ -117,6 +134,8 @@ class XmlParser:
         Returns "self.lok_long"\n
         Return type is string. The string is the longitude of the boat.\n
         """
+        self.read_xml()
+
         self.watt_hour = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt hour.
         self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
         self.lok_lat = self.root.find(".//boatData/PositionLat").text  #Looks for PositionLat in XML file.
@@ -142,8 +161,20 @@ class XmlParser:
         self.get_volt_temp()
         self.get_time()
         self.get_std_data()
-        
-        
+    
+    def __str__(self) -> str:
+        return(f"""
+        Voltage for battery {self.voltage_list}
+        Temperature for battery {self.temp_list}
+        Boat ID = {self.boat_id}
+        Lattitude = {self.lok_lat}
+        Longitude = {self.lok_long}
+        Event time = {self.date}
+        Watt hour = {self.watt_hour}
+        """)
+    
+
+
 if __name__ == '__main__':
     xml_parser= XmlParser()
    # xml_parser.get_voltage()

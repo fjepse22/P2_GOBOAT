@@ -76,7 +76,6 @@ Battery_voltage FLOAT
 -- Restrains for the Boats table
 
 
-
 -- restrains for the Batteries table
 ALTER TABLE Goboat.Batteries
 ADD CONSTRAINT batteries_FK
@@ -115,7 +114,7 @@ UNIQUE (Battery_ID);
 
 ALTER TABLE Goboat.Boats_batteries
 -- Every boat needs at least one battery
-ADD CONSTRAINT 
+ADD CONSTRAINT Boats_batteries_number
 CHECK (Slot_number>=1);
 
 

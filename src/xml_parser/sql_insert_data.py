@@ -50,7 +50,7 @@ class DatabaseConnection:
 
         # Fetch the battery_ID's
         cursor.execute(
-            f"""SELECT * FROM Goboat.boats WHERE Boat_ID = '{boat_ID}'""", 
+            f"""SELECT * FROM Goboat.Boats WHERE Boat_ID = '{boat_ID}'""", 
         )
         # battery row 1-8 contains the battery, the vallue is null if there is not battery in the place
         batteries= cursor.fetchone()

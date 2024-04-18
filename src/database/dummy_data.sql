@@ -79,7 +79,7 @@ VALUES
 
 -- Data for the boats
 
-INSERT INTO Goboat.boats_batteries (Battery_ID,Boat_ID,Slot_number)
+INSERT INTO Goboat.Boats_batteries (Battery_ID,Boat_ID,Slot_number)
 VALUES
 ('bat11','boat1',1),
 ('bat12','boat1',2),
@@ -91,7 +91,7 @@ VALUES
 ('bat18','boat1',8)
 ;
 
-INSERT INTO Goboat.boats_batteries (Battery_ID,Boat_ID,Slot_number)
+INSERT INTO Goboat.Boats_batteries (Battery_ID,Boat_ID,Slot_number)
 VALUES
 ('bat21','boat2',1),
 ('bat22','boat2',2),
@@ -115,7 +115,7 @@ VALUES
 ('bat38','boat3',8)
 ;
 
-INSERT INTO Goboat.boats_batteries (Battery_ID,Boat_ID,Slot_number)
+INSERT INTO Goboat.Boats_batteries (Battery_ID,Boat_ID,Slot_number)
 VALUES
 ('bat41','boat4',1),
 ('bat42','boat4',2),
@@ -127,7 +127,7 @@ VALUES
 ('bat48','boat4',8)
 ;
 
-INSERT INTO Goboat.boats_batteries (Battery_ID,Boat_ID,Slot_number)
+INSERT INTO Goboat.Boats_batteries (Battery_ID,Boat_ID,Slot_number)
 VALUES
 ('bat51','boat5',1),
 ('bat52','boat5',2),

@@ -102,7 +102,7 @@ REFERENCES Boats (Boat_ID);
 ALTER TABLE Goboat.Boats_batteries
 ADD CONSTRAINT Boats_batteries_FK_battery
 FOREIGN KEY (Battery_ID)
-REFERENCES batteries (Serial_Number);
+REFERENCES Batteries (Serial_Number);
 
 ALTER TABLE Goboat.Boats_batteries
 ADD CONSTRAINT Boats_batteries_unique_slot
@@ -135,7 +135,7 @@ UNIQUE (Boat_ID,Data_time);
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_FK_Data_boat
 FOREIGN KEY (Data_ID)
-REFERENCES data_boat (Data_ID);
+REFERENCES Data_Boat (Data_ID);
 
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_FK_Data_battery
@@ -145,6 +145,3 @@ REFERENCES Batteries (Serial_Number);
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_Unique
 UNIQUE (Data_ID,Battery_ID);
-
-
-

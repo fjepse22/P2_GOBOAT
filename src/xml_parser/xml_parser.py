@@ -1,4 +1,4 @@
-#Version 0.15 | Encoding UTF-8
+#Version 0.16 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
@@ -9,66 +9,6 @@ import logging
 from datetime import datetime
 from lxml import etree
 from packet_controller import validate
-
-xml_test = """<?xml version="1.0"?>
-
-<!-- 	
-		XML for Status data
-		Version 1.0 | Encoding: UTF-8
-		Created by: Maiken Hammer
-		Date: 13/03-2024
-		Modified by: -None-
-		Date: -None-
--->
-
-<status_data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="sch_status_data.xsd">
-	<boatData>
-		<ID>1</ID>
-		<PositionLat>33</PositionLat>
-		<PositionLon>-144</PositionLon>
-		<Time>14:02:46</Time>
-	</boatData>
-	<battData>
-		<Battery1>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery1>
-		<Battery2>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery2>
-		<Battery3>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery3>
-		<Battery4>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery4>
-		<Battery5>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery5>
-		<Battery6>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery6>
-		<Battery7>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery7>
-		<Battery8>
-			<Voltage>12</Voltage>
-			<Temperature>21</Temperature>
-		</Battery8>
-		<Draw>2.3</Draw>
-	</battData>
-
-</status_data>"""
-
-
-
 
 class XmlParser:
     """
@@ -82,7 +22,7 @@ class XmlParser:
     - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml",xml_from_file=True):
+    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml"):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename='error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -92,9 +32,9 @@ class XmlParser:
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml(xsd_path,xml_path,xml_from_file)
+        self.read_xml(xsd_path,xml_path)
     
-    def read_xml(self,xsd_path,xml_path,xml_from_file):
+    def read_xml(self,xsd_path,xml_path):
         """
         Reads the XML file and stores it in self.root\n
         The XML-file can eithe be found via a file directory or recieved via xml\n
@@ -102,10 +42,9 @@ class XmlParser:
         \n
         ------------
         PARAMETERS\n
-        xds_path = The path of the file to check xml-integrety. It is always used\n
-        xml_path = The path to the xml-file, only used if "xml_from_file=True"\n
-        If xml_from_file = False, then xml_path is a variable with the entire xml-file
-        xml_from_file
+        xds_path = The path of the file to check xml-integrety.\n
+        xml_path = The path to the xml-file or the string in xml-format"\n
+    
         self:\n
         ------------
         RETURNS\n
@@ -114,36 +53,24 @@ class XmlParser:
         Return type is ElementTree\n
         """
         
-        if xml_from_file == True:
+        try:
             try:
                 self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
-            except FileNotFoundError:
-                self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
-                exit(1)
-            
-            except ET.ParseError:
-                self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
-                exit(1)
-
-            if not validate(xsd_path,xml_path):
-                self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
-                exit(1)
-        else:
-            try:
-                #self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
+            # if xml_path is not a path but a string, the program wil read the string as an xml-file.
+            except:
                 self.root = ET.fromstring(xml_path) #Reads the XML file and stores it in root.
-            except FileNotFoundError:
-                self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
-                exit(1)
-            
-            except ET.ParseError:
-                self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
-                exit(1)
+        except FileNotFoundError:
+            self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
+            exit(1)
+        
+        except ET.ParseError:
+            self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
+            exit(1)
 
+        if not validate(xsd_path,xml_path):
+            self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
+            exit(1)
 
-            if not validate(xsd_path,xml_path):
-                self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
-                exit(1)
         
         return self.root
             
@@ -268,15 +195,6 @@ class XmlParser:
 
 
 if __name__ == '__main__':
-    xml_parser= XmlParser(xml_path=xml_test,xsd_path="sch_status_data.xsd",xml_from_file=False)
-    
-    # xml_parser.get_voltage()
-    # xml_parser.get_time()
-    # xml_parser.get_std_data()
-    xml_parser.get_all_data()
-
-    print(xml_parser)
-
 
     xml_parser= XmlParser()
     xml_parser.get_all_data()

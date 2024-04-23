@@ -1,13 +1,73 @@
-#Version 0.14 | Encoding UTF-8
+#Version 0.15 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 22-04-2024
+#Last modified 23-04-2024
 
 import xml.etree.ElementTree as ET
 import logging
 from datetime import datetime
+from lxml import etree
 from packet_controller import validate
+
+xml_test = """<?xml version="1.0"?>
+
+<!-- 	
+		XML for Status data
+		Version 1.0 | Encoding: UTF-8
+		Created by: Maiken Hammer
+		Date: 13/03-2024
+		Modified by: -None-
+		Date: -None-
+-->
+
+<status_data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="sch_status_data.xsd">
+	<boatData>
+		<ID>1</ID>
+		<PositionLat>33</PositionLat>
+		<PositionLon>-144</PositionLon>
+		<Time>14:02:46</Time>
+	</boatData>
+	<battData>
+		<Battery1>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery1>
+		<Battery2>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery2>
+		<Battery3>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery3>
+		<Battery4>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery4>
+		<Battery5>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery5>
+		<Battery6>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery6>
+		<Battery7>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery7>
+		<Battery8>
+			<Voltage>12</Voltage>
+			<Temperature>21</Temperature>
+		</Battery8>
+		<Draw>2.3</Draw>
+	</battData>
+
+</status_data>"""
+
+
 
 
 class XmlParser:
@@ -22,7 +82,7 @@ class XmlParser:
     - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
     """
 
-    def __init__(self):
+    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml",xml_from_file=True):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename='error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -32,14 +92,20 @@ class XmlParser:
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
+        self.read_xml(xsd_path,xml_path,xml_from_file)
     
-    def read_xml(self):
+    def read_xml(self,xsd_path,xml_path,xml_from_file):
         """
         Reads the XML file and stores it in self.root\n
+        The XML-file can eithe be found via a file directory or recieved via xml\n
+        This method should only called by the __init__ method
         \n
         ------------
         PARAMETERS\n
-        \n
+        xds_path = The path of the file to check xml-integrety. It is always used\n
+        xml_path = The path to the xml-file, only used if "xml_from_file=True"\n
+        If xml_from_file = False, then xml_path is a variable with the entire xml-file
+        xml_from_file
         self:\n
         ------------
         RETURNS\n
@@ -47,22 +113,37 @@ class XmlParser:
         Returns "self.root"\n
         Return type is ElementTree\n
         """
-        xsd_path = "sch_status_data.xsd"
-        xml_path = "status_data.xml"
-
-        try:
-            self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
-        except FileNotFoundError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
-            exit(1)
         
-        except ET.ParseError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
-            exit(1)
+        if xml_from_file == True:
+            try:
+                self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
+            except FileNotFoundError:
+                self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
+                exit(1)
+            
+            except ET.ParseError:
+                self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
+                exit(1)
 
-        if not validate(xml_path, xsd_path):
-            self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
-            exit(1)
+            if not validate(xsd_path,xml_path):
+                self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
+                exit(1)
+        else:
+            try:
+                #self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
+                self.root = ET.fromstring(xml_path) #Reads the XML file and stores it in root.
+            except FileNotFoundError:
+                self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
+                exit(1)
+            
+            except ET.ParseError:
+                self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
+                exit(1)
+
+
+            if not validate(xsd_path,xml_path):
+                self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
+                exit(1)
         
         return self.root
             
@@ -85,7 +166,7 @@ class XmlParser:
         """
         
         i=0
-        self.read_xml()
+      ##  self.read_xml()
         while True:
             Battery_number=(".//Battery"+str(i+1))  #Increment Battery number to get the right name/root.
 
@@ -114,7 +195,7 @@ class XmlParser:
         Returns "self.date"\n
         Return type is string. The string is in yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46\n
         """
-        self.read_xml()
+       # self.read_xml()
         
         local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
         time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
@@ -145,7 +226,7 @@ class XmlParser:
         Returns "self.lok_long"\n
         Return type is string. The string is the longitude of the boat.\n
         """
-        self.read_xml()
+      #  self.read_xml()
 
         self.watt_hour = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt hour.
         self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
@@ -187,10 +268,17 @@ class XmlParser:
 
 
 if __name__ == '__main__':
-    xml_parser= XmlParser()
-   # xml_parser.get_voltage()
-   # xml_parser.get_time()
-   # xml_parser.get_std_data()
+    xml_parser= XmlParser(xml_path=xml_test,xsd_path="sch_status_data.xsd",xml_from_file=False)
+    
+    # xml_parser.get_voltage()
+    # xml_parser.get_time()
+    # xml_parser.get_std_data()
     xml_parser.get_all_data()
 
     print(xml_parser)
+
+
+    xml_parser= XmlParser()
+    xml_parser.get_all_data()
+    print(xml_parser)
+

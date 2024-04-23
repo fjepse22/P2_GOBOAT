@@ -1,13 +1,15 @@
-#Version 0.13 | Encoding UTF-8
+#Version 0.14 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 18-04-2024
-
+#Last modified 22-04-2024
 
 import xml.etree.ElementTree as ET
 import logging
 from datetime import datetime
+from packet_controller import validate
+
+
 class XmlParser:
     """
     The class XmlParser is used to read an XML file and extract data from it. The data is stored in the class variables.\n 
@@ -22,7 +24,7 @@ class XmlParser:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename='xml_parser_error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        self.logging=logging.basicConfig(filename='error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
         self.watt_hour = int(0) #Based on Draw from xml.
@@ -45,14 +47,23 @@ class XmlParser:
         Returns "self.root"\n
         Return type is ElementTree\n
         """
+        xsd_path = "sch_status_data.xsd"
+        xml_path = "status_data.xml"
+
         try:
-            self.root = ET.fromstring(open('status_data.xml').read()) #Reads the XML file and stores it in root.
+            self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
         except FileNotFoundError:
-            self.logger.error("The file status_data.xml does not exist")
+            self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
             exit(1)
+        
         except ET.ParseError:
-            self.logger.error("The file is not valid XML")
+            self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
             exit(1)
+
+        if not validate(xml_path, xsd_path):
+            self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
+            exit(1)
+        
         return self.root
             
     def get_volt_temp(self):

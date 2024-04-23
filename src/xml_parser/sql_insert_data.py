@@ -1,8 +1,8 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
-
+# Version 1.1
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified: 16-04-2024
+# last modified: 23-04-2024
 # last modified by: Frederik Jepsen
 
 # TESTER PULL REQUEST
@@ -39,6 +39,10 @@ class DatabaseConnection:
 
         It will only insert the data, if the amount of batteries for the boat correspont to the lentgh of the Voltage_array.
 
+        It will insert data into the tables Data_Boat and Voltage.
+
+        If somethings goes wrong no changes will be commited into the database.
+
         """
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
@@ -52,15 +56,7 @@ class DatabaseConnection:
         cursor.execute(
             f"""SELECT * FROM Goboat.Boats WHERE Boat_ID = '{boat_ID}'""", 
         )
-        # battery row 1-8 contains the battery, the vallue is null if there is not battery in the place
-        batteries= cursor.fetchone()
 
-
-        batteries = list(batteries)
-
-        for i in range(0,len(batteries)):
-            if type(batteries[i]) != str:
-                batteries[i] = "nobat"
 
         # The command to insert all data of the boat except the voltage of the battery.
         insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,Watt_hour)

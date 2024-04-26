@@ -1,0 +1,208 @@
+# See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
+
+# Writen by Magnus F. Kavin
+# Created 26-04-2024
+# last modified: 26-04-2024
+# last modified by: Magnus Kavin
+
+import mariadb
+import sys
+
+from kivy.app import App
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+
+
+
+
+
+# class forms connection to database
+class DatabaseConnection:
+    """
+    DatabaseConnection(user,password,host,port=3306,database=Goboat)
+
+    This class is used to connect to the Goboat database in order to insert battery logs into the Goboat database.
+    The class have the following methods
+    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
+    """
+
+    def __init__(self,user,password,host,port=3306,database='Goboat'):
+
+
+
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+        self.database = database
+
+
+    def get_boats(self):
+        try:
+            connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            sys.exit(1)
+        # Get Cursor
+        cursor = connection.cursor()
+
+        # Fetch the battery_ID's
+        cursor.execute(
+            f"""SELECT Boat_ID FROM Goboat.boats""", 
+        )
+
+
+        # getting results from cursor, storing them in a list and printing it.
+        results= cursor.fetchall() 
+        boat_list=[i[0] for i in results]
+        # print(boat_IDs)
+
+        # free resources
+        cursor.close()
+        connection.close()
+
+        return boat_list
+
+
+
+
+
+    def get_details(self,boat_list):
+        
+        details_boats = {}
+        
+        try:
+            connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            sys.exit(1)
+       
+
+        for boat_ID in boat_list:
+            # Get Cursor
+            cursor = connection.cursor()
+
+            #cursor selects most recent row from the data_boat table for the desired boat.
+            cursor.execute(
+                f"""SELECT Lok_lat, Lok_long, Watt_hour FROM Goboat.data_boat WHERE Boat_ID = '{boat_ID}' ORDER BY Data_time DESC LIMIT 1""", 
+            )
+
+
+
+            # getting results from cursor and storing them
+            results = cursor.fetchall() 
+
+
+            
+            for row in results:
+                Lok_lat, Lok_long, Watt_hour = row
+                details_boats[boat_ID]= {'Latitude': Lok_lat, 'longitude': Lok_long, 'Watt': Watt_hour}
+               
+        
+        
+        # Close connection to free the server.
+        cursor.close()
+        connection.close()
+
+        print(details_boats)
+        return details_boats
+        
+
+
+
+
+#appen defineres
+class BoatGUI(App):
+    def __init__(self, boat_list, **kwargs):
+        super().__init__(**kwargs)
+        self.boat_list = boat_list
+        self.dict_boats=Goboat.get_details(self.boat_list)
+
+    def build(self):
+        layout = BoxLayout(orientation='vertical')
+        
+
+        for boat in self.boat_list:
+            button = BoatButton(self.dict_boats,boat,
+                                 size_hint_y=None, height=100)
+            layout.add_widget(button)
+        return layout
+
+
+
+class BoatButton(Button):
+    def __init__(self, dict_boats, boat, **kwargs):
+        super().__init__(**kwargs)
+        self.dict_boats = dict_boats
+
+        self.text = f"{boat}"
+        self.bind(on_press=lambda instance: self.show_details(boat))
+
+    def show_details(self,boat):
+        content = BoxLayout(orientation='vertical', padding=10, spacing=5)
+        try:
+            for key, value in self.dict_boats[boat].items():
+                label_text = f"{key.capitalize()}: {value}"
+                label = Label(text=label_text)
+                content.add_widget(label)
+        
+            popup = Popup(title='Boat Details',
+                        content=content,
+                        size_hint=(None, None), size=(400, 300))
+            popup.open()
+
+        except:
+            label_text = "no details found"
+            label = Label(text=label_text)
+            content.add_widget(label)
+    
+            popup = Popup(title='error',
+                        content=content,
+                        size_hint=(None, None), size=(400, 300))
+            popup.open()
+
+
+        
+
+
+
+
+
+
+
+if __name__ == '__main__':
+
+    # Testserver on own computer.change user and password input to connect to server.
+    Goboat = DatabaseConnection(user="root",password="zxcv1234",host="127.0.0.1")
+
+    
+    ui=BoatGUI(Goboat.get_boats())
+   
+    ui.run()    
+
+
+
+
+
+    # gamle testcommands
+
+
+    # test_list= ['boat1']
+    # ui=BoatGUI(test_list)
+    # test_dict={
+    # 'boat1': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
+    # 'boat2': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
+    # }
+  
+
+    
+    
+    # Goboat.get_boats()
+  
+
+    # Goboat.get_details(test_list)
+    
+

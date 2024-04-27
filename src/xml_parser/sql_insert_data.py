@@ -1,15 +1,15 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
-# Version 1.1
+# Version 1.2
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified: 23-04-2024
+# last modified: 27-04-2024
 # last modified by: Frederik Jepsen
 
 # TESTER PULL REQUEST
 
 import mariadb
 import sys
-
+import logging
 import xml_parser as xml_p
 
 class DatabaseConnection:
@@ -22,7 +22,8 @@ class DatabaseConnection:
     """
 
     def __init__(self,user,password,host,port=3306,database='Goboat'):
-
+        self.logger = logging.getLogger(__name__)
+        self.logging=logging.basicConfig(filename='sql_error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
 
 
         self.user = user
@@ -46,16 +47,12 @@ class DatabaseConnection:
         """
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
+            self.logger.info(f'Connected sucessfully to {self.database} with user {self.user}')
         except mariadb.Error as e:
-            print(f"Error connecting to MariaDB Platform: {e}")
+            self.logger.error(f'Error connecting to MariaDB Platform: {e}')
             sys.exit(1)
         # Get Cursor
         cursor = connection.cursor()
-
-        # Fetch the battery_ID's
-        cursor.execute(
-            f"""SELECT * FROM Goboat.Boats WHERE Boat_ID = '{boat_ID}'""", 
-        )
 
 
         # The command to insert all data of the boat except the voltage of the battery.
@@ -81,8 +78,8 @@ class DatabaseConnection:
             cursor.execute(find_batteries)
             fetch = cursor.fetchall()
             batteries = fetch
-        except:
-            print(f'Could not find batteries for the boat with ID {boat_ID}')
+        except mariadb.Error as e:
+            self.logger.error(f'Could not find batteries for the boat with ID {boat_ID}: {e}')
             cursor.close()
             connection.close()
             return
@@ -94,8 +91,7 @@ class DatabaseConnection:
             pass    
         else:
             # raise Exception(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
-            print(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
-            print(f'Therefore the data is not logged')
+            self.logger.error(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
             cursor.close()
             connection.close()
             return
@@ -103,8 +99,8 @@ class DatabaseConnection:
         try:
             cursor.execute(insert_data)
                 
-        except:
-            print("insert into table Data_boat failed")
+        except mariadb.Error as e:
+            self.logger.error(f"insert into table Data_boat failed: {e}" )
             cursor.close()
             connection.close()
             return
@@ -113,8 +109,8 @@ class DatabaseConnection:
             cursor.execute(find_Data_ID)
             fetch = cursor.fetchall()
             Data_ID = fetch[0][0]
-        except:
-            print(f'select statement failed could not find Data_ID {Data_ID} in table Data_boat')
+        except mariadb.Error as e:
+            self.logger.error(f'select statement failed could not find Data_ID {Data_ID} in table Data_boat {e}')
             cursor.close()
             connection.close()
             return
@@ -129,8 +125,8 @@ class DatabaseConnection:
             for i in range(0,len(Voltage_array)):
                 cursor.execute(f""" INSERT INTO Goboat.Voltage (Data_ID,Battery_ID,Battery_temperature,Battery_voltage)
             VALUES ('{Data_ID}','{batteries[i][0]}','{Battery_temperatures[i]}','{Voltage_array[i]}');""")
-        except:
-            print("failed to insert data to the voltage table")
+        except mariadb.Error as e:
+            self.logger.error(f"failed to insert data to the voltage table {e}")
             cursor.close()
             connection.close()
             return
@@ -138,10 +134,10 @@ class DatabaseConnection:
 
         # if everything went without errors, the updated values are implementet
         connection.commit()
-
         # free resources
         cursor.close()
         connection.close()
+        self.logger.info(f'Data from xml-file inserted to database with Data_ID: {Data_ID}')
 
 if __name__ == '__main__':
 

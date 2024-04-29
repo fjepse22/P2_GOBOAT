@@ -50,7 +50,6 @@ class DatabaseConnection:
             self.logger.info(f'Connected sucessfully to {self.database} with user {self.user}')
         except mariadb.Error as e:
             self.logger.error(f'Error connecting to MariaDB Platform: {e}')
-            sys.exit(1)
         # Get Cursor
         cursor = connection.cursor()
 

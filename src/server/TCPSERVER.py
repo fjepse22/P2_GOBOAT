@@ -14,7 +14,6 @@ import socket
 import selectors
 from xml_parser import XmlParser
 import sql_insert_data as sql
-import threading
 
 """
 This needs to be event based with a que system, in order to ensure that all data gets into the database
@@ -59,8 +58,7 @@ class SQL_socket:
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
 
         #This start the the listening process
-
-     
+        #self.logger=logging.basicConfig(filename='/home/Gruppe250/test/SQL_socket.log', level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s')
 
     def __accept(self,sock, mask):
         """
@@ -71,6 +69,7 @@ class SQL_socket:
         
         
         """
+        print('accept function is running')
         self.conn, self.addr = self.sock.accept() # Should be ready
         print('accepted', self.conn, 'from', self.addr)
         self.conn.setblocking(False)
@@ -86,24 +85,22 @@ class SQL_socket:
 
 
         """
-
+        print('read function is running')
         data = b''
         while b"EOF" not in data: # runs while EOF(end of file) is not in the data, which is recieved last from the client. 
             try:
                 data += self.conn.recv(self.BUFFER_SIZE) # used try except to avoid blocking error
             except BlockingIOError:
-                continue
-        
+                continue  
         self.sel.unregister(self.conn)
         self.conn.close()
 
         # Creates a XML-file out of the data string and removes the end of file string.
         xml_file= str(data[:-3], 'UTF-8')
 
-
         self.__insert_data(xml_file)
 
-        # Threading i not yet implemented
+        # Threading is not yet implemented
 
         #event = threading.Event(target=self.insert_data, args=(str(xml_file),),name=f'Insert_xml_thread_{self.CONN_COUNTER}')
        # event.set()
@@ -120,13 +117,14 @@ class SQL_socket:
         This method should only be called by the __read() method.
         
         """
-        
-        xml_parser= XmlParser(xsd_path="sch_status_data.xsd", xml_path=str(xml)) #inserets the xml data into the xml_parser from the client. 
-        xml_parser.get_all_data()
-        Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host) # establish connection to the database
-        input = xml_parser
+        xml_parser= XmlParser(xsd_path="home/Gruppe250/test/sch_status_data.xsd", xml_path=str(xml)) #inserets the xml data into the xml_parser from the client.
 
-        Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt_hour=input.watt_hour,Voltage_array=input.voltage_list)
+        xml_parser.get_all_data()
+        if xml_parser.valdid_xml == True:
+            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host) # establish connection to the database
+            input = xml_parser
+
+            Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt_hour=input.watt_hour,Voltage_array=input.voltage_list)
 
 
     def run(self):
@@ -137,7 +135,6 @@ class SQL_socket:
         This method calls the loop that will constantly listen for something on the specified port self.PORT\n
         Warning!!! This will start an unstoppable while True loop.
         """
-
         while True:
             events = self.sel.select()
             for key, mask in events:
@@ -145,7 +142,6 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 
-if __name__ == "__main__":
-    test = SQL_socket(user="frederik",password="password")
-    print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
-    test.run()
+test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1")
+print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
+test.run()

@@ -23,7 +23,7 @@ class DatabaseConnection:
 
     def __init__(self,user,password,host,port=3306,database='Goboat'):
         self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename='sql_error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        self.logging=logging.basicConfig(filename='/home/Gruppe250/test/sql_error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
 
 
         self.user = user

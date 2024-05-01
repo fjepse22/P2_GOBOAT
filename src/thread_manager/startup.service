@@ -7,7 +7,7 @@ Type=exec
 User=Gruppe250
 ExecStart=/usr/bin/python3 -u /home/Gruppe250/test/thread_manager.py
 Restart=always
-RestartSec=1
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target

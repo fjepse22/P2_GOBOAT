@@ -1,14 +1,8 @@
-#Version 0.23 | Encoding UTF-8
+#Version 0.24 | Encoding UTF-8
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 26-04-2024
-
-
-
-# I will try to make this a class, so it is a module.
-
-# This does currently not crash, but it refuses a connection with anything.
+#Last modified 1-05-2024
 
 import socket
 import selectors
@@ -21,34 +15,38 @@ This needs to be event based with a que system, in order to ensure that all data
 
 class SQL_socket:
     """
-    SQL_socket(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None)
-
-    This socket is used to recieve xml-files that are to be inserted into the SQL-server.
-
-    It can only connect to the Goboat database on port 3306.
-
-    Once the object is made it will start to listen on 
+    This socket is used to recieve xml-files that are to be inserted into the SQL-server.\n
+    It can only connect to the Goboat database on port 3306.\n
+    Once the object is made it will start to listen on. \n
+    \n
     
+    List of class methods:\n
+    - __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None): Initialises the object and starts the process to listen\n
+
+    - __accept(self,sock, mask): Used to establish a connection to a client, that sends a xml-file.\n
+
+    - __read(self, sock, mask): This method is used to recieve the xml-data from a client and insert it into the database\n
+
+    - __insert_data(self,xml):  This method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method. \n
+
+    - run(self): This method calls the loop that will constantly listen for something on the specified port self.PORT\n
     """
 
-    def __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None) -> None:
+    def __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None, directory="/home/Gruppe250/test") -> None:
         """
-         __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None)
-
-
          Initialises the object and starts the process to listen
         """
 
 
-        self.HOST=  HOST          # Symbolic name meaning all available interfaces
-        self.PORT = PORT         # Arbitrary non-privileged port
-        self.CONN_COUNTER = CONN_COUNTER    # Counter for connections
-        self.BUFFER_SIZE = BUFFER_SIZE  # Receive Buffer size (power of 2)
-        self.sel = selectors.DefaultSelector()
-        self.user = user
-        self.password = password
-        self.host = host
-
+        self.HOST=  HOST                        # Symbolic name meaning all available interfaces
+        self.PORT = PORT                        # Arbitrary non-privileged port
+        self.CONN_COUNTER = CONN_COUNTER        # Counter for connections
+        self.BUFFER_SIZE = BUFFER_SIZE          # Receive Buffer size (power of 2)
+        self.sel = selectors.DefaultSelector()  # Selector for the sockets, used for event based sockets
+        self.user = user                        # Username to the database
+        self.password = password                # Password to the database
+        self.host = host                        # Where the database hosts the database
+        self.directory = directory              # Directory to the folder
 
         #Creates sockets
         self.sock = socket.socket()
@@ -58,34 +56,46 @@ class SQL_socket:
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
 
         #This start the the listening process
-        #self.logger=logging.basicConfig(filename='/home/Gruppe250/test/SQL_socket.log', level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s')
 
     def __accept(self,sock, mask):
         """
-        __accept(self,sock, mask)
-
-        Should not be run by a user.\n
-        Used to establish a connection to a client, that sends a xml-file
-        
-        
+        This private method is used to establish a connection to a client, that sends a xml-file, Should not be run by a user.\n
+        \n
+        ------------
+        PARAMETERS\n
+        sock:\n
+        mask:\n
+    
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
         """
-        print('accept function is running')
+
         self.conn, self.addr = self.sock.accept() # Should be ready
-        print('accepted', self.conn, 'from', self.addr)
         self.conn.setblocking(False)
         self.sel.register(self.conn, selectors.EVENT_READ, self.__read)
 
 
-    def __read(self,sock, mask):
+    def __read(self,sock, mask): 
         """
-        __read(self)
+        This private method is used to recieve the xml-data from a client and insert it into the SQL-database\n
+        \n
+        ------------
+        PARAMETERS\n
+        sock:\n
+        mask:\n
+    
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
+        """
         
-        This method is used to recieve the xml-file from a client.\n
-        Will after that insert the xml-data into the SQL-database
-
-
-        """
-        print('read function is running')
         data = b''
         while b"EOF" not in data: # runs while EOF(end of file) is not in the data, which is recieved last from the client. 
             try:
@@ -100,10 +110,10 @@ class SQL_socket:
 
         self.__insert_data(xml_file)
 
-        # Threading is not yet implemented
+        # Threading for inserting data into database is not yet implemented
 
         #event = threading.Event(target=self.insert_data, args=(str(xml_file),),name=f'Insert_xml_thread_{self.CONN_COUNTER}')
-       # event.set()
+        #event.set()
         self.CONN_COUNTER +=1
 
 
@@ -111,17 +121,25 @@ class SQL_socket:
 
     def __insert_data(self,xml):
         """
-        __insert_data(xml)
-        
-        This method is used to connect to the Goboat database and insert the data from the xml-file.\n
-        This method should only be called by the __read() method.
-        
+        This private method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method.\n
+        \n
+        ------------
+        PARAMETERS\n
+        xml: The data from the xml-file or the path to the xml-file.\n 
+    
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
         """
-        xml_parser= XmlParser(xsd_path="home/Gruppe250/test/sch_status_data.xsd", xml_path=str(xml)) #inserets the xml data into the xml_parser from the client.
+
+        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_path=str(xml), directory=self.directory) #inserets the xml data into the xml_parser from the client.
 
         xml_parser.get_all_data()
         if xml_parser.valdid_xml == True:
-            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host) # establish connection to the database
+            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database='Goboat', directory=self.directory) # establish connection to the database
             input = xml_parser
 
             Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt_hour=input.watt_hour,Voltage_array=input.voltage_list)
@@ -129,19 +147,28 @@ class SQL_socket:
 
     def run(self):
         """
-        run()
-        
-
-        This method calls the loop that will constantly listen for something on the specified port self.PORT\n
-        Warning!!! This will start an unstoppable while True loop.
+        This method calls the loop that will constantly listen for something on the specified port self.PORT, and makes a queue for clients that is yet to be handled\n
+        This method should be called by the user, but is a while True loop, so it will not break.\n
+        \n
+        ------------
+        PARAMETERS\n
+    
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
         """
+
         while True:
             events = self.sel.select()
             for key, mask in events:
                 callback = key.data
                 callback(key.fileobj, mask)
 
+if __name__ == "__main__":
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1")
+    print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
+    test.run()
 
-test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1")
-print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
-test.run()

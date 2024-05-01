@@ -1,8 +1,8 @@
-#Version 0.16 | Encoding UTF-8
+#Version 0.18 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 23-04-2024
+#Last modified 1-05-2024
 
 import xml.etree.ElementTree as ET
 import logging
@@ -19,11 +19,14 @@ class XmlParser:
     - get_time(): b: Looks for time sent from the xml file and adds the current date to it.\n
 
     - get_std_data(): Looks for the rest of the more simple data and adds it to variables\n
+
+    - __str__(): Gathers the data in a string, making it nice to read, if printed \n
+
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml"):
+    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml", directory=""):
         self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename='home/Gruppe250/test/error.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
         self.watt_hour = int(0) #Based on Draw from xml.
@@ -31,7 +34,7 @@ class XmlParser:
         self.lok_long = int(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml(xsd_path,xml_path)
+        self.read_xml(xsd_path,xml_path) #Reads the XML file and stores it in self.root
         
     
     def read_xml(self,xsd_path,xml_path):
@@ -87,12 +90,11 @@ class XmlParser:
         Returns "self.voltage_list"\n
         Return type is list. List element type is FLOAT\n
 
-        Returns "self.temp_list"\n
-        Return type is list. List element type is FLOAT\n
+        Returns "None"\n
+        Return None\n
         """
         
         i=0
-      ##  self.read_xml()
         if self.valdid_xml==True:
             while True:
                 Battery_number=(".//Battery"+str(i+1))  #Increment Battery number to get the right name/root.
@@ -104,12 +106,11 @@ class XmlParser:
                     self.voltage_list.append(data.find(".//Voltage").text) #Appends the value of voltage to self.voltage_list.
                     self.temp_list.append(data.find(".//Temperature").text ) #Appends the value of temperature in celsius to self.temp_list.
                     i+=1  
-                
     
     
     def get_time(self):
         """
-        Looks for time sent from the xml file and adds the current date to it.\n
+        Looks for time sent from the xml file and adds the current date to it. In the format yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46\\n
         \n
         ------------
         PARAMETERS\n
@@ -118,10 +119,9 @@ class XmlParser:
         ------------
         RETURNS\n
         \n
-        Returns "self.date"\n
-        Return type is string. The string is in yyyy-mm-dd hh:mm:ss format ex. 2024-04-11 14:02:46\n
+        Returns "None"\n
+        Return None\n
         """
-       # self.read_xml()
         if self.valdid_xml==True:
             local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
             time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
@@ -129,7 +129,7 @@ class XmlParser:
 
     def get_std_data(self):
         """
-        Looks for the rest of the more simple data and adds it to variables.\n
+        Looks for the rest of the more simple data and if self.valid_xml is True it adds it to variables. If False it will not try to read the data.\n
         \n
         ------------
         PARAMETERS\n
@@ -138,19 +138,9 @@ class XmlParser:
         ------------
         RETURNS\n
         \n
-        Returns "self.watt_hour"\n
-        Return type is string. The string is the value of Draw in the XML file.\n
-
-        Returns "self.boat_id"\n
-        Return type is string. The string is the ID of the boat.\n
-
-        Returns "self.lok_lat"\n
-        Return type is string. The string is the latitude of the boat.\n
-
-        Returns "self.lok_long"\n
-        Return type is string. The string is the longitude of the boat.\n
+        Returns "None"\n
+        Return None\n
         """
-      #  self.read_xml()
         if self.valdid_xml==True:
             self.watt_hour = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt hour.
             self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
@@ -177,6 +167,19 @@ class XmlParser:
             self.get_std_data()
     
     def __str__(self) -> str:
+        """
+        Gathers the data in a string, making it nice to read, if printed.\n
+        \n
+        ------------
+        PARAMETERS\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
+        """
         return(f"""
         Voltage for battery {self.voltage_list}
         Temperature for battery {self.temp_list}
@@ -188,7 +191,6 @@ class XmlParser:
         """)
 
 if __name__ == '__main__':
-
     xml_parser= XmlParser()
     xml_parser.get_all_data()
     print(xml_parser)

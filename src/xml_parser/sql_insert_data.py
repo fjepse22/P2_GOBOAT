@@ -1,14 +1,13 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
-# Version 1.2
+# Version 1.21
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified: 27-04-2024
-# last modified by: Frederik Jepsen
+# last modified: 1-05-2024
+# modified by: Frederik Jepsen, Ib Leminen
 
 # TESTER PULL REQUEST
 
 import mariadb
-import sys
 import logging
 import xml_parser as xml_p
 
@@ -21,9 +20,9 @@ class DatabaseConnection:
     - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
     """
 
-    def __init__(self,user,password,host,port=3306,database='Goboat'):
+    def __init__(self,user,password,host,port=3306,database='Goboat', directory=''):
         self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename='/home/Gruppe250/test/sql_insert.log', format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        self.logging=logging.basicConfig(filename=(directory+'/sql_insert.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
 
 
         self.user = user

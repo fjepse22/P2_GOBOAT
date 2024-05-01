@@ -13,16 +13,17 @@ import xml_parser as xml_p
 
 class DatabaseConnection:
     """
-    DatabaseConnection(user,password,host,port=3306,database=Goboat)
+    The class ThreadManager is used to run the TCPSERVER on a thread.\n 
 
-    This class is used to connect to the Goboat database in order to insert battery logs into the Goboat database.
-    The class have the following methods
-    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
+    List of class methods:\n
+    - __init__(self,user,password,host,port=3306,database='Goboat', directory=''): Initializes the class with the user, password, host, port, database and directory.\n
+    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array): Inserts the data into the Goboat database.\n
+
     """
-
+  
     def __init__(self,user,password,host,port=3306,database='Goboat', directory=''):
-        self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename=(directory+'/sql_insert.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        self.logger = logging.getLogger(__name__) # This is used to log the errors that might occur.
+        self.logging=logging.basicConfig(filename=(directory+'/sql_insert.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG) #This is used to format the log, and what information it should contain.
 
 
         self.user = user
@@ -33,17 +34,29 @@ class DatabaseConnection:
 
     def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,Watt_hour,Voltage_array):
         """
-        insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,Watt_hour,Voltage_array)
-
-        This method connects to the Goboat database and insert the data recieved from the xml-file.
-
-        It will only insert the data, if the amount of batteries for the boat correspont to the lentgh of the Voltage_array.
-
-        It will insert data into the tables Data_Boat and Voltage.
-
-        If somethings goes wrong no changes will be commited into the database.
-
+        This method connects to the Goboat database and insert the data recieved from the xml data.\n
+        It will only insert the data, if the amount of batteries for the boat corresponding to the length of the Voltage_array.\n
+        It will insert data into the tables Data_Boat and Voltage.\n
+        If somethings goes wrong no changes will be commited into the database.\n
+        \n
+        ------------
+        PARAMETERS\n
+        boat_ID: The ID of the boat\n
+        Date: The date and time of the data\n
+        Lok_lat: The latitude of the boat\n
+        Lok_long: The longitude of the boat\n
+        Battery_temperatures: The temperature of the batteries in a list\n
+        Watt_hour: The amount of watt hours\n
+        Voltage_array: The voltage of the batteries in a list\n
+        \n
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "None"\n
+        Return None\n
         """
+
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
             self.logger.info(f'Connected sucessfully to {self.database} with user {self.user}')
@@ -58,7 +71,7 @@ class DatabaseConnection:
         VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{Watt_hour});"""
         
 
-        # this command is used to fine the Data_ID in order to link the data about battery voltage to the rest of the boat data.
+        # this command is used to find the Data_ID in order to link the data about battery voltage to the rest of the boat data.
         # it is possible to extract this information before you commit the data, as the Data_ID get reserved for the duration.
         find_Data_ID = f"""SELECT Data_ID
         From Goboat.Data_Boat

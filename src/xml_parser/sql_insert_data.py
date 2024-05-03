@@ -1,8 +1,8 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
-# Version 1.21
+# Version 1.22
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified: 1-05-2024
+# last modified: 3-05-2024
 # modified by: Frederik Jepsen, Ib Leminen
 
 # TESTER PULL REQUEST
@@ -17,7 +17,7 @@ class DatabaseConnection:
 
     List of class methods:\n
     - __init__(self,user,password,host,port=3306,database='Goboat', directory=''): Initializes the class with the user, password, host, port, database and directory.\n
-    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array): Inserts the data into the Goboat database.\n
+    - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,watt,Voltage_array): Inserts the data into the Goboat database.\n
 
     """
   
@@ -32,7 +32,7 @@ class DatabaseConnection:
         self.port = port
         self.database = database
 
-    def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,Watt_hour,Voltage_array):
+    def insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperatures,watt,Voltage_array):
         """
         This method connects to the Goboat database and insert the data recieved from the xml data.\n
         It will only insert the data, if the amount of batteries for the boat corresponding to the length of the Voltage_array.\n
@@ -46,7 +46,7 @@ class DatabaseConnection:
         Lok_lat: The latitude of the boat\n
         Lok_long: The longitude of the boat\n
         Battery_temperatures: The temperature of the batteries in a list\n
-        Watt_hour: The amount of watt hours\n
+        watt: The amount of watt hours\n
         Voltage_array: The voltage of the batteries in a list\n
         \n
         self:\n
@@ -67,8 +67,8 @@ class DatabaseConnection:
 
 
         # The command to insert all data of the boat except the voltage of the battery.
-        insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,Watt_hour)
-        VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{Watt_hour});"""
+        insert_data = f"""INSERT INTO Goboat.Data_Boat (Boat_ID,Data_time,Lok_lat,Lok_long,watt)
+        VALUES ('{boat_ID}','{Date}','{Lok_lat}','{Lok_long}',{watt});"""
         
 
         # this command is used to find the Data_ID in order to link the data about battery voltage to the rest of the boat data.
@@ -157,5 +157,5 @@ if __name__ == '__main__':
     data = xml_p.XmlParser()
     data.get_all_data()
 
-    Goboat.insert_boat_data(boat_ID=data.boat_id,Date=data.date,Lok_lat=data.lok_lat,Lok_long=data.lok_long,Battery_temperatures=data.temp_list,Watt_hour=data.watt_hour,Voltage_array=data.voltage_list)
+    Goboat.insert_boat_data(boat_ID=data.boat_id,Date=data.date,Lok_lat=data.lok_lat,Lok_long=data.lok_long,Battery_temperatures=data.temp_list,watt=data.watt,Voltage_array=data.voltage_list)
 

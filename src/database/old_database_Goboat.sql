@@ -1,4 +1,9 @@
 CREATE DATABASE Goboat;
+
+-- This is the old database, which is no longer used.
+-- the reason for that is, the table and column names are bad.
+
+
 -- version 1.0
 -- Writen by: Frederik B. B. Jepsen
 -- created: 12-04-2024
@@ -6,7 +11,6 @@ CREATE DATABASE Goboat;
 -- Last Modified by: Frederik B. B. Jepsen
 
 -- This file creates the GoBOAT database with all the tables and restrictions.
-
 
 -- Table with the boats
 -- all bateries have a unique ID which is the serial number of the battery

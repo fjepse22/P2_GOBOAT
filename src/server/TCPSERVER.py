@@ -1,8 +1,8 @@
-#Version 0.24 | Encoding UTF-8
+#Version 0.25 | Encoding UTF-8
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 1-05-2024
+#Last modified 3-05-2024
 
 import socket
 import selectors
@@ -138,11 +138,12 @@ class SQL_socket:
         xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_path=str(xml), directory=self.directory) #inserets the xml data into the xml_parser from the client.
 
         xml_parser.get_all_data()
-        if xml_parser.valdid_xml == True:
+        print(xml_parser)
+        if xml_parser.valid_xml == True:
             Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database='Goboat', directory=self.directory) # establish connection to the database
             input = xml_parser
 
-            Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt_hour=input.watt_hour,Voltage_array=input.voltage_list)
+            Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt=input.watt,Voltage_array=input.voltage_list)
 
 
     def run(self):

@@ -1,4 +1,4 @@
-#Version 0.20 | Encoding UTF-8
+#Version 0.21 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
@@ -24,7 +24,7 @@ class XmlParser:
 
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml", directory=""):
+    def __init__(self,xsd_path="/sch_status_data.xsd",xml_path="status_data.xml", directory=""):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -34,7 +34,7 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml(xsd_path,xml_path) #Reads the XML file and stores it in self.root
+        self.read_xml((directory+xsd_path),xml_path) #Reads the XML file and stores it in self.root
         
     
     def read_xml(self,xsd_path,xml_path):
@@ -56,24 +56,26 @@ class XmlParser:
         Return None\n
         """
         self.valid_xml=True
-        try:
+
+        if type(xml_path)!=type(""):
+            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_path)} and not a string""")
+            self.valid_xml=False
+        
+        if self.valid_xml==True:
             try:
-                self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
-            # if xml_path is not a path but a string, the program wil read the string as an xml-file.
-            except:
-                self.root = ET.fromstring(xml_path) #Reads the XML data and stores it in root.
-        except ET.ParseError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The data is not in XML format")
-            self.valid_xml=False
+                try:
+                    self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
+                # if xml_path is not a path but a string, the program wil read the string as an xml-file.
+                except:
+                    self.root = ET.fromstring(xml_path) #Reads the XML data and stores it in root.
+            except ET.ParseError:
+                self.logger.error(f"""File: xml_parser.py\nErrorType: ET.ParseError\nThe string is not in XML format\n""")
+                self.valid_xml=False
 
-        except TypeError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The data is the wrong type" )
-            self.valid_xml=False
-
-        if self.valid_xml==True and not validate(xsd_path,xml_path):
-            self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
-            self.valid_xml=False
-            
+            if self.valid_xml==True and not validate(xsd_path,xml_path):
+                self.logger.error(f"""File: packet_controller.py\nThe XML file is not valid according to the XSD schema\n""")
+                self.valid_xml=False
+         
     def get_volt_temp(self):
         """
         Looks for every battery in the xml-file and reads the voltage and temperature from it, and appends it to self.voltage_list and self.temp_list\n

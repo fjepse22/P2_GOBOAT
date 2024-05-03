@@ -24,7 +24,7 @@ class XmlParser:
 
     """
 
-    def __init__(self,xsd_path="/sch_status_data.xsd",xml_path="status_data.xml", directory=""):
+    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml", directory=""):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -34,7 +34,7 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml((directory+xsd_path),xml_path) #Reads the XML file and stores it in self.root
+        self.read_xml((xsd_path),xml_path) #Reads the XML file and stores it in self.root
         
     
     def read_xml(self,xsd_path,xml_path):

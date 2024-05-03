@@ -1,4 +1,4 @@
-#Version 0.25 | Encoding UTF-8
+#Version 0.26 | Encoding UTF-8
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
@@ -32,7 +32,7 @@ class SQL_socket:
     - run(self): This method calls the loop that will constantly listen for something on the specified port self.PORT\n
     """
 
-    def __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None, directory="/home/Gruppe250/test") -> None:
+    def __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None, directory="/home/Gruppe250/test",database='goboatv2') -> None:
         """
          Initialises the object and starts the process to listen
         """
@@ -47,6 +47,7 @@ class SQL_socket:
         self.password = password                # Password to the database
         self.host = host                        # Where the database hosts the database
         self.directory = directory              # Directory to the folder
+        self.database = database                #the name of the database
 
         #Creates sockets
         self.sock = socket.socket()
@@ -140,10 +141,10 @@ class SQL_socket:
         xml_parser.get_all_data()
         print(xml_parser)
         if xml_parser.valid_xml == True:
-            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database='Goboat', directory=self.directory) # establish connection to the database
+            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
             input = xml_parser
 
-            Goboat.insert_boat_data(boat_ID=input.boat_id,Date=input.date,Lok_lat=input.lok_lat,Lok_long=input.lok_long,Battery_temperatures=input.temp_list,Watt=input.watt,Voltage_array=input.voltage_list)
+            Goboat.insert_boat_data(boat_ID=input.boat_id,date=input.date,lok_lat=input.lok_lat,lok_long=input.lok_long,temperatures=input.temp_list,watt=input.watt,voltage_array=input.voltage_list)
 
 
     def run(self):
@@ -169,7 +170,7 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 if __name__ == "__main__":
-    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1")
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2')
     print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
     test.run()
 

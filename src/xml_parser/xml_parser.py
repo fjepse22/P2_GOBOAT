@@ -1,8 +1,8 @@
-#Version 0.18 | Encoding UTF-8
+#Version 0.20 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 1-05-2024
+#Last modified 3-05-2024
 
 import xml.etree.ElementTree as ET
 import logging
@@ -29,9 +29,9 @@ class XmlParser:
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
-        self.watt_hour = int(0) #Based on Draw from xml.
-        self.lok_lat = int(0)  #Latitude used to locate the boat.
-        self.lok_long = int(0)  #Longitude used to locate the boat. 
+        self.watt = float(0) #Based on Draw from xml.
+        self.lok_lat =float(0)  #Latitude used to locate the boat.
+        self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
         self.read_xml(xsd_path,xml_path) #Reads the XML file and stores it in self.root
@@ -52,29 +52,27 @@ class XmlParser:
         ------------
         RETURNS\n
         \n
-        Returns "self.root"\n
-        Return type is ElementTree\n
+        Returns "None"\n
+        Return None\n
         """
-        self.valdid_xml=True
+        self.valid_xml=True
         try:
             try:
                 self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
             # if xml_path is not a path but a string, the program wil read the string as an xml-file.
             except:
-                self.root = ET.fromstring(xml_path) #Reads the XML file and stores it in root.
-        except FileNotFoundError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The file status_data.xml does not exist")
-            self.valdid_xml=False
-        
+                self.root = ET.fromstring(xml_path) #Reads the XML data and stores it in root.
         except ET.ParseError:
-            self.logger.error("File: status_data.xml"+"\n"+"      The file is not valid XML")
-            self.valdid_xml=False
+            self.logger.error("File: status_data.xml"+"\n"+"      The data is not in XML format")
+            self.valid_xml=False
 
-        if not validate(xsd_path,xml_path) and self.valdid_xml==True:
+        except TypeError:
+            self.logger.error("File: status_data.xml"+"\n"+"      The data is the wrong type" )
+            self.valid_xml=False
+
+        if self.valid_xml==True and not validate(xsd_path,xml_path):
             self.logger.error("File: status_data.xml"+"\n"+"      The XML file is not valid according to the XSD schema")
-            self.valdid_xml=False
-        
-        return self.root
+            self.valid_xml=False
             
     def get_volt_temp(self):
         """
@@ -95,17 +93,16 @@ class XmlParser:
         """
         
         i=0
-        if self.valdid_xml==True:
-            while True:
-                Battery_number=(".//Battery"+str(i+1))  #Increment Battery number to get the right name/root.
+        while True:
+            Battery_number=(".//Battery"+str(i+1))  #Increment Battery number to get the right name/root.
 
-                if self.root.find(Battery_number+"/Voltage") == None:  #Looks to see if there is another battery, if None it doesnt exist.
-                    break
+            if self.root.find(Battery_number+"/Voltage") == None:  #Looks to see if there is another battery, if None it doesnt exist.
+                break
 
-                for data in self.root.findall(Battery_number):  #Looks for specific battery in xml file, for instance Battery1
-                    self.voltage_list.append(data.find(".//Voltage").text) #Appends the value of voltage to self.voltage_list.
-                    self.temp_list.append(data.find(".//Temperature").text ) #Appends the value of temperature in celsius to self.temp_list.
-                    i+=1  
+            for data in self.root.findall(Battery_number):  #Looks for specific battery in xml file, for instance Battery1
+                self.voltage_list.append(data.find(".//Voltage").text) #Appends the value of voltage to self.voltage_list.
+                self.temp_list.append(data.find(".//Temperature").text ) #Appends the value of temperature in celsius to self.temp_list.
+                i+=1  
     
     
     def get_time(self):
@@ -122,10 +119,9 @@ class XmlParser:
         Returns "None"\n
         Return None\n
         """
-        if self.valdid_xml==True:
-            local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
-            time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
-            self.date=local_time+" "+time  
+        local_time=datetime.today().strftime("%Y-%m-%d")  #For getting year, month and day 
+        time = self.root.find(".//boatData/Time").text  #Finds time from XML file, time is hr, min and sec
+        self.date=local_time+" "+time  
 
     def get_std_data(self):
         """
@@ -141,11 +137,10 @@ class XmlParser:
         Returns "None"\n
         Return None\n
         """
-        if self.valdid_xml==True:
-            self.watt_hour = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt hour.
-            self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
-            self.lok_lat = self.root.find(".//boatData/PositionLat").text  #Looks for PositionLat in XML file.
-            self.lok_long = self.root.find(".//boatData/PositionLon").text  #Looks for PositionLon in XML file.
+        self.watt = self.root.find(".//battData/Draw").text  #Looks for Draw in XML file, which is the value of watt.
+        self.boat_id = "boat"+self.root.find(".//boatData/ID").text  #Looks for ID number in XML and adds "boat" to it.
+        self.lok_lat = self.root.find(".//boatData/PositionLat").text  #Looks for PositionLat in XML file.
+        self.lok_long = self.root.find(".//boatData/PositionLon").text  #Looks for PositionLon in XML file.
     
     def get_all_data(self):
         """
@@ -161,7 +156,7 @@ class XmlParser:
         Returns "None"\n
         Return None\n
         """
-        if self.valdid_xml==True:
+        if self.valid_xml==True:
             self.get_volt_temp()
             self.get_time()
             self.get_std_data()
@@ -187,7 +182,7 @@ class XmlParser:
         Lattitude = {self.lok_lat}
         Longitude = {self.lok_long}
         Event time = {self.date}
-        Watt hour = {self.watt_hour}
+        Watt hour = {self.watt}
         """)
 
 if __name__ == '__main__':

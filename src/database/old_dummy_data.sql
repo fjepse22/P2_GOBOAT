@@ -4,7 +4,7 @@
 -- last modified:
 -- Last Modified by:
 
-
+-- This is dummy data for the old database
 -- This file adds dummy data for boats, batteries, battery models and the boats battery tables
 -- This data is needed in order to insert data about the boat's battery state.
 

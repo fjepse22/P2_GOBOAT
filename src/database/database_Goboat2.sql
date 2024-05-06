@@ -1,6 +1,5 @@
-DROP DATABASE goboatv2;
 CREATE DATABASE goboatv2;
--- version 1.0
+-- version 1.1
 -- Writen by: Frederik B. B. Jepsen
 -- created: 12-04-2024
 -- last modified: 13-04-3024

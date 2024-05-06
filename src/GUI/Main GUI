@@ -1,8 +1,8 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
 
 # Writen by Magnus F. Kavin
-# Created 26-04-2024
-# last modified: 26-04-2024
+# Created 23-04-2024
+# last modified: 06-05-2024
 # last modified by: Magnus Kavin
 
 import mariadb
@@ -14,7 +14,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-
+from kivy.clock import Clock
 
 
 
@@ -22,16 +22,14 @@ from kivy.uix.label import Label
 # class forms connection to database
 class DatabaseConnection:
     """
-    DatabaseConnection(user,password,host,port=3306,database=Goboat)
+    DatabaseConnection(user,password,host,port=3306,database=goboatv2)
 
     This class is used to connect to the Goboat database in order to insert battery logs into the Goboat database.
     The class have the following methods
     - insert_boat_data(self,boat_ID,Date,Lok_lat,Lok_long,Battery_temperature,Watt_hour,Voltage_array)
     """
 
-    def __init__(self,user,password,host,port=3306,database='Goboat'):
-
-
+    def __init__(self,user,password,host,port=3306,database='goboatv2'):
 
         self.user = user
         self.password = password
@@ -41,6 +39,10 @@ class DatabaseConnection:
 
 
     def get_boats(self):
+        """
+        No inputs
+        Queries the database and returns a list of all boats
+        """
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
         except mariadb.Error as e:
@@ -51,14 +53,13 @@ class DatabaseConnection:
 
         # Fetch the battery_ID's
         cursor.execute(
-            f"""SELECT Boat_ID FROM Goboat.boats""", 
+            f"""SELECT Boat_ID FROM goboatv2.boats""", 
         )
 
 
-        # getting results from cursor, storing them in a list and printing it.
+        # getting results from cursor, storing them in a list.
         results= cursor.fetchall() 
         boat_list=[i[0] for i in results]
-        # print(boat_IDs)
 
         # free resources
         cursor.close()
@@ -69,10 +70,21 @@ class DatabaseConnection:
 
 
 
-
     def get_details(self,boat_list):
         
+        """
+        Queries the Lok_lat, Lok_long and Watt_hour values for each boat.
+        Returns a dictionary 
+
+        output example:
+        {
+        'boat1': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
+        'boat2': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
+        }
+        """
+
         details_boats = {}
+        
         
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
@@ -85,63 +97,123 @@ class DatabaseConnection:
             # Get Cursor
             cursor = connection.cursor()
 
+        
             #cursor selects most recent row from the data_boat table for the desired boat.
             cursor.execute(
-                f"""SELECT Lok_lat, Lok_long, Watt_hour FROM Goboat.data_boat WHERE Boat_ID = '{boat_ID}' ORDER BY Data_time DESC LIMIT 1""", 
+                f"""SELECT lok_lat, lok_long, watt, data_time FROM goboatv2.boat_log 
+                WHERE boat_ID = '{boat_ID}' ORDER BY Data_time DESC LIMIT 1""", 
             )
 
 
 
             # getting results from cursor and storing them
-            results = cursor.fetchall() 
+            boat_data = cursor.fetchall() 
 
+            for row in boat_data:
+                lok_lat, lok_long, watt, data_time = row
+                details_boats[boat_ID]= {'Latitude': lok_lat, 'Longitude': lok_long, 'Watt': watt, 'Last updated': data_time, 'Batteries':{}}
+            
+
+            cursor.execute(
+                f"""SELECT bat_ID, voltage, temperature FROM goboatv2.boat_log 
+                INNER JOIN battery_log ON goboatv2.boat_log.data_ID=goboatv2.battery_log.data_ID
+                WHERE data_time = '{data_time}' AND boat_ID = '{boat_ID}'""", 
+            )
+
+            battery_data = cursor.fetchall() 
+            for row in battery_data:
+                bat_ID, voltage, temperature = row
+                
+                details_boats[boat_ID]['Batteries'][bat_ID]= {'Voltage': voltage, 'Temperature': temperature}
 
             
-            for row in results:
-                Lok_lat, Lok_long, Watt_hour = row
-                details_boats[boat_ID]= {'Latitude': Lok_lat, 'longitude': Lok_long, 'Watt': Watt_hour}
                
-        
         
         # Close connection to free the server.
         cursor.close()
         connection.close()
 
-        print(details_boats)
         return details_boats
         
 
 
 
 
-#appen defineres
+#GUI app class is defined
 class BoatGUI(App):
+    """
+    BoatGUI(boat_list)
+
+    The BoatGUI class contains the main window for the user interface. The methods included are dedicated to building and formatting the gui window. 
+    """
     def __init__(self, boat_list, **kwargs):
         super().__init__(**kwargs)
         self.boat_list = boat_list
         self.dict_boats=Goboat.get_details(self.boat_list)
 
+
     def build(self):
+        """
+        Builds the gui. 
+        Uses the boat list to create a button for each individual boat, displaying that boats data. 
+        """
         layout = BoxLayout(orientation='vertical')
         
 
         for boat in self.boat_list:
-            button = BoatButton(self.dict_boats,boat,
+        
+           #set button color
+            try:
+                if self.dict_boats[boat]['Watt']<2:
+                    colour = (1, 0, 0, 1)  # Red
+                
+                #not currently in use
+                # elif self.dict_boats[boat]['Watt']< :
+                #     colour = (1, 1, 0, 1)  # Yellow
+                
+                else:
+                    colour = (0, 1, 0, 1)  # Green
+
+            except:
+                colour = (1, 1, 0, 1)  # Yellow (currently for when no info is in the database for selected boat.)
+                pass 
+                
+        
+
+            # create button
+            button = BoatButton(self.dict_boats,boat,colour,
                                  size_hint_y=None, height=100)
+            
+            
+           
             layout.add_widget(button)
+
         return layout
 
 
 
 class BoatButton(Button):
-    def __init__(self, dict_boats, boat, **kwargs):
+    """
+    BoatButton(dict_boats,boat, colour)
+    Defines the buttons in the gui. takes a dictionary, a boat ID and colour values as inputs.
+    """
+
+    def __init__(self, dict_boats, boat, colour, **kwargs):
         super().__init__(**kwargs)
         self.dict_boats = dict_boats
-
+        self.background_color=colour
         self.text = f"{boat}"
-        self.bind(on_press=lambda instance: self.show_details(boat))
+        self.bind(on_press=lambda instance: self.show_details(boat)) #binds the show_details() function to the button.
+
+
+        
 
     def show_details(self,boat):
+        """
+        Takes  
+        Creates a popup when a button is clicked.
+        Popup contains info on the selected boat.
+        """
         content = BoxLayout(orientation='vertical', padding=10, spacing=5)
         try:
             for key, value in self.dict_boats[boat].items():
@@ -151,7 +223,7 @@ class BoatButton(Button):
         
             popup = Popup(title='Boat Details',
                         content=content,
-                        size_hint=(None, None), size=(400, 300))
+                        size_hint=(None, None), size=(600, 400))
             popup.open()
 
         except:
@@ -178,31 +250,6 @@ if __name__ == '__main__':
     # Testserver on own computer.change user and password input to connect to server.
     Goboat = DatabaseConnection(user="root",password="zxcv1234",host="127.0.0.1")
 
-    
-    ui=BoatGUI(Goboat.get_boats())
-   
+    boat_list=Goboat.get_boats()
+    ui=BoatGUI(boat_list)
     ui.run()    
-
-
-
-
-
-    # gamle testcommands
-
-
-    # test_list= ['boat1']
-    # ui=BoatGUI(test_list)
-    # test_dict={
-    # 'boat1': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
-    # 'boat2': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
-    # }
-  
-
-    
-    
-    # Goboat.get_boats()
-  
-
-    # Goboat.get_details(test_list)
-    
-

@@ -174,34 +174,69 @@ class BoatGUI(App):
         
 
         for boat in self.boat_list:
-        
-           #set button color
-            try:
-                if self.dict_boats[boat]['Watt']<2:
-                    colour = (1, 0, 0, 1)  # Red
-                
-                #not currently in use
-                # elif self.dict_boats[boat]['Watt']< :
-                #     colour = (1, 1, 0, 1)  # Yellow
-                
-                else:
-                    colour = (0, 1, 0, 1)  # Green
-
-            except:
-                colour = (1, 1, 0, 1)  # Yellow (currently for when no info is in the database for selected boat.)
-                pass 
-                
-        
+            
+            #get colour
+            colour= self.set_colour(boat)     
 
             # create button
             button = BoatButton(self.dict_boats,boat,colour,
                                  size_hint_y=None, height=100)
-            
-            
-           
             layout.add_widget(button)
 
         return layout
+    
+
+    def set_colour(self, boat):
+        #set button color according to data. values are placeholders
+        try:
+            avrg_temp_and_volt= self.get_average_temp_and_volt(boat) #[0]=avrg_temp, [1]=avrg_volt
+            
+            
+            #makes button red in certain error states. Current error state is if watt is less than two. More error states can be added
+            if self.dict_boats[boat]['Watt']<2:
+                colour = (1, 0, 0, 1)  # Red
+
+
+            elif avrg_temp_and_volt[1]<4: #if voltage is less than six
+                colour = (1, 1, 0, 1)  # Yellow                
+            
+            
+            #no issues: button is greeen
+            else:
+                colour = (0, 1, 0, 1)  # Green
+
+        except:
+            #no boat data
+            colour = (0, 1, 3, 0.5)  # blue
+            pass 
+
+        return colour
+
+
+
+
+
+    def get_average_temp_and_volt(self,boat):
+        # Get average temps and volt for installed batteries
+        total_voltage = 0.0
+        total_temperature= 0.0
+        num_batteries = 0
+
+        
+        for battery_info in self.dict_boats[boat]['Batteries'].values():
+            total_voltage += battery_info['Voltage']
+            total_temperature += battery_info['Temperature']
+            num_batteries += 1
+            
+            if num_batteries == 0:
+                print('No batteries')  # Avoid division by zero
+                
+            avrg_temp = total_temperature / num_batteries
+            avrg_volt = total_voltage / num_batteries
+        
+        return [avrg_temp, avrg_volt]
+    
+
 
 
 
@@ -240,11 +275,13 @@ class BoatButton(Button):
                 label = Label(text=label_text)
                 content.add_widget(label)
 
+            
             popup = Popup(title='Boat Details',
                         content=content,
                         size_hint=(None, None), size=(1000, 800))
             popup.open()
-
+        
+            
         except:
             label_text = "no boat data found"
             label = Label(text=label_text)
@@ -256,10 +293,6 @@ class BoatButton(Button):
             popup.open()
 
 
-        
-
-
-
 
 if __name__ == '__main__':
 
@@ -269,4 +302,3 @@ if __name__ == '__main__':
     boat_list=Goboat.get_boats()
     ui=BoatGUI(boat_list)
     ui.run()    
-

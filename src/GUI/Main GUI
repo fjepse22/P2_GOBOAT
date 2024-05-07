@@ -9,7 +9,6 @@ import mariadb
 import sys
 
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
@@ -66,8 +65,6 @@ class DatabaseConnection:
         connection.close()
 
         return boat_list
-
-
 
 
     def get_details(self,boat_list):
@@ -159,10 +156,10 @@ class BoatGUI(App):
 
     The BoatGUI class contains the main window for the user interface. The methods included are dedicated to building and formatting the gui window. 
     """
-    def __init__(self, boat_list, **kwargs):
+    def __init__(self, boat_list, dict_boats, **kwargs):
         super().__init__(**kwargs)
         self.boat_list = boat_list
-        self.dict_boats=Goboat.get_details(self.boat_list)
+        self.dict_boats = dict_boats
 
 
     def build(self):
@@ -213,9 +210,6 @@ class BoatGUI(App):
         return colour
 
 
-
-
-
     def get_average_temp_and_volt(self,boat):
         # Get average temps and volt for installed batteries
         total_voltage = 0.0
@@ -253,8 +247,6 @@ class BoatButton(Button):
         self.text = f"{boat}"
         self.bind(on_press=lambda instance: self.show_details(boat)) #binds the show_details() function to the button.
 
-
-        
 
     def show_details(self,boat):
         """
@@ -294,11 +286,12 @@ class BoatButton(Button):
 
 
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     # Testserver on own computer.change user and password input to connect to server.
     Goboat = DatabaseConnection(user="root",password="zxcv1234",host="127.0.0.1")
 
-    boat_list=Goboat.get_boats()
-    ui=BoatGUI(boat_list)
+    boat_list = Goboat.get_boats()
+    boat_dict = Goboat.get_details(boat_list)
+    ui=BoatGUI(boat_list, boat_dict)
     ui.run()    

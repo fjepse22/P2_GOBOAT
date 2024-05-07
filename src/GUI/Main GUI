@@ -2,7 +2,7 @@
 
 # Writen by Magnus F. Kavin
 # Created 23-04-2024
-# last modified: 06-05-2024
+# last modified: 07-05-2024
 # last modified by: Magnus Kavin
 
 import mariadb
@@ -77,9 +77,21 @@ class DatabaseConnection:
         Returns a dictionary 
 
         output example:
-        {
-        'boat1': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
-        'boat2': {'Latitude': 33.0, 'longitude': -144.0, 'Watt': 2.3},
+        {'boat1': 
+            {'Latitude': 33.0, 
+            'Longitude': -144.0, 
+            'Watt': 2.3, 
+            'Last updated': datetime.datetime(2024, 5, 6, 14, 2, 46), 
+            'Batteries':   {'bat11': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat12': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat13': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat14': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat15': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat16': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat17': {'Voltage': 12.0, 'Temperature': 21.0}, 
+                            'bat18': {'Voltage': 12.0, 'Temperature': 21.0}
+                            }
+            },
         }
         """
 
@@ -106,14 +118,15 @@ class DatabaseConnection:
 
 
 
-            # getting results from cursor and storing them
+            # getting results from cursor and storing them in dictionary
             boat_data = cursor.fetchall() 
 
             for row in boat_data:
                 lok_lat, lok_long, watt, data_time = row
                 details_boats[boat_ID]= {'Latitude': lok_lat, 'Longitude': lok_long, 'Watt': watt, 'Last updated': data_time, 'Batteries':{}}
             
-
+           
+            # gets battery data for the relevant boat at the relevant time to add to the dictionary. This info is not displayed in current version of the GUI.
             cursor.execute(
                 f"""SELECT bat_ID, voltage, temperature FROM goboatv2.boat_log 
                 INNER JOIN battery_log ON goboatv2.boat_log.data_ID=goboatv2.battery_log.data_ID
@@ -217,17 +230,23 @@ class BoatButton(Button):
         content = BoxLayout(orientation='vertical', padding=10, spacing=5)
         try:
             for key, value in self.dict_boats[boat].items():
+                if key is not 'Batteries':
+                    label_text = f"{key.capitalize()}: {value}"
+                    label = Label(text=label_text)
+                    content.add_widget(label)
+
+            for key, value in self.dict_boats[boat]['Batteries'].items():
                 label_text = f"{key.capitalize()}: {value}"
                 label = Label(text=label_text)
                 content.add_widget(label)
-        
+
             popup = Popup(title='Boat Details',
                         content=content,
-                        size_hint=(None, None), size=(600, 400))
+                        size_hint=(None, None), size=(1000, 800))
             popup.open()
 
         except:
-            label_text = "no details found"
+            label_text = "no boat data found"
             label = Label(text=label_text)
             content.add_widget(label)
     
@@ -242,9 +261,6 @@ class BoatButton(Button):
 
 
 
-
-
-
 if __name__ == '__main__':
 
     # Testserver on own computer.change user and password input to connect to server.
@@ -253,3 +269,4 @@ if __name__ == '__main__':
     boat_list=Goboat.get_boats()
     ui=BoatGUI(boat_list)
     ui.run()    
+

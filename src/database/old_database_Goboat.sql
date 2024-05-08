@@ -1,4 +1,9 @@
 CREATE DATABASE Goboat;
+
+-- This is the old database, which is no longer used.
+-- the reason for that is, the table and column names are bad.
+
+
 -- version 1.0
 -- Writen by: Frederik B. B. Jepsen
 -- created: 12-04-2024
@@ -6,7 +11,6 @@ CREATE DATABASE Goboat;
 -- Last Modified by: Frederik B. B. Jepsen
 
 -- This file creates the GoBOAT database with all the tables and restrictions.
-
 
 -- Table with the boats
 -- all bateries have a unique ID which is the serial number of the battery
@@ -56,7 +60,6 @@ Boat_ID  char(8),
 Data_time DATETIME,
 Lok_lat FLOAT,
 Lok_long FLOAT,
-Battery_temperature FLOAT,
 Watt_hour FLOAT
 );
 
@@ -66,6 +69,7 @@ CREATE TABLE Goboat.Voltage(
 Row_ID INT PRIMARY KEY AUTO_INCREMENT,
 Data_ID INT,
 Battery_ID CHAR(8),
+Battery_temperature FLOAT,
 Battery_voltage FLOAT
 );
 
@@ -74,7 +78,6 @@ Battery_voltage FLOAT
 -- Here are alle the restrains defined (the primary and foreign key relatoins.
 
 -- Restrains for the Boats table
-
 
 
 -- restrains for the Batteries table
@@ -103,7 +106,7 @@ REFERENCES Boats (Boat_ID);
 ALTER TABLE Goboat.Boats_batteries
 ADD CONSTRAINT Boats_batteries_FK_battery
 FOREIGN KEY (Battery_ID)
-REFERENCES batteries (Serial_Number);
+REFERENCES Batteries (Serial_Number);
 
 ALTER TABLE Goboat.Boats_batteries
 ADD CONSTRAINT Boats_batteries_unique_slot
@@ -115,7 +118,7 @@ UNIQUE (Battery_ID);
 
 ALTER TABLE Goboat.Boats_batteries
 -- Every boat needs at least one battery
-ADD CONSTRAINT 
+ADD CONSTRAINT Boats_batteries_number
 CHECK (Slot_number>=1);
 
 
@@ -136,7 +139,7 @@ UNIQUE (Boat_ID,Data_time);
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_FK_Data_boat
 FOREIGN KEY (Data_ID)
-REFERENCES data_boat (Data_ID);
+REFERENCES Data_Boat (Data_ID);
 
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_FK_Data_battery
@@ -146,6 +149,3 @@ REFERENCES Batteries (Serial_Number);
 ALTER TABLE Goboat.Voltage
 ADD CONSTRAINT Voltage_Unique
 UNIQUE (Data_ID,Battery_ID);
-
-
-

@@ -1,13 +1,14 @@
-#Version 0.21 | Encoding UTF-8
+#Version 1.00 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 3-05-2024
+#Last modified 10-05-2024
 
 import xml.etree.ElementTree as ET
 import logging
 from datetime import datetime
 from packet_controller import validate
+from generate_xml import CreateXML
 
 class XmlParser:
     """
@@ -24,7 +25,7 @@ class XmlParser:
 
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd",xml_path="status_data.xml", directory=""):
+    def __init__(self,xsd_path="sch_status_data.xsd", directory="", unit_dict={},voltage_dict={},temp_dict={}):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -34,10 +35,9 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml((xsd_path),xml_path) #Reads the XML file and stores it in self.root
+        self.read_xml((xsd_path),unit_dict, voltage_dict, temp_dict) #Reads the XML file and stores it in self.root
         
-    
-    def read_xml(self,xsd_path,xml_path):
+    def read_xml(self,xsd_path,unit_dict, voltage_dict, temp_dict):
         """
         Reads the XML file and stores it in self.root\n
         The XML-file can eithe be found via a file directory or recieved via xml\n
@@ -56,9 +56,15 @@ class XmlParser:
         Return None\n
         """
         self.valid_xml=True
+        try:
+            create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
+            xml_path=create_xml.generateXML()
+        except:
+            self.logger.error(f"""File: generate_xml.py\nErrorType: CreateXML\nThe dictionary is not formatted right\n""")
+            self.valid_xml=False
 
-        if type(xml_path)!=type(""):
-            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_path)} and not a string""")
+        if self.valid_xml==False and type(xml_path)!=type(""):
+            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_path)} and not a string\n""")
             self.valid_xml=False
         
         if self.valid_xml==True:
@@ -184,10 +190,10 @@ class XmlParser:
         Lattitude = {self.lok_lat}
         Longitude = {self.lok_long}
         Event time = {self.date}
-        Watt hour = {self.watt}
+        Watt = {self.watt}
         """)
 
 if __name__ == '__main__':
-    xml_parser= XmlParser()
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/") #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
     print(xml_parser)

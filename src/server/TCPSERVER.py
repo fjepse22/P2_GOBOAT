@@ -154,10 +154,11 @@ class SQL_socket:
             except json.decoder.JSONDecodeError:
                 safe_data=False
                 self.logger.error(f"""File: TCPSERVER.py\nErrorType: json.decoder.JSONDecodeError\nCouldn't convert bytes into dictionary\n""")
-
+        
         if safe_data==True:
-            xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = json.loads(data[0].decode('utf-8')), voltage_dict=json.loads(data[1].decode('utf-8')), temp_dict=json.loads(data[2].decode('utf-8'))) #inserets the xml data into the xml_parser from the client.
+            xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
             xml_parser.get_all_data()
+            print(xml_parser)
 
             if xml_parser.valid_xml == True:
                 Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database

@@ -63,7 +63,7 @@ class SimDataBatt():
             for _ in range(len(self.soc_key ) -1):
                 if charge <= self.soc_key[_] and charge > self.soc_key[_ +1]:
                     self.return_value = self.batt_def.get(self.soc_key[_])
-                return self.return_value, float(self.temp)
+                    return self.return_value, float(self.temp)
             if charge <= self.soc_key[len(self.soc_key)]:
                 self.return_value = self.batt_def.get(self.soc_key[_])
 

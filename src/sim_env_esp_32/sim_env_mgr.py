@@ -10,7 +10,7 @@ from sim_data_pos import Pos
 from sim_data_loc_time import SimDataLocTime
 from sim_data_pdraw import PDraw
 from sim_data_batt import SimDataBatt
-#from esp_tcpclient import Client
+from esp_tcpclient import Client
 from logger import Logger
 
 class SimEnvMgr:
@@ -75,22 +75,21 @@ class SimEnvMgr:
         lap_counter = 0
         run = 1
 
+        #Instantiation of battery and consumer classes
+        try:
+            batt_1 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_2 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_3 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_4 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_5 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_6 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_7 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_8 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            pd = PDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
+        except Exception as e:
+            self.log.critical(f"An error occurred whilie instantiating: {e}")
 
         while run != 0:
-            
-            #Instantiation of battery and consumer classes
-            try:
-                batt_1 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_2 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_3 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_4 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_5 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_6 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_7 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_8 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                pd = PDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
-            except Exception as e:
-                self.log.critical(f"An error occurred whilie instantiating: {e}")
 
             #Creating files for updating data
             self.new_data_pos_lat = {"pos_lat" : Pos.move(self.data_unit.get("pos_lat"), 1)}
@@ -173,5 +172,5 @@ class SimEnvMgr:
         TBD!!!\n
         \n
         """
-        #client=Client()
-        #client.send_data(unit_dict, voltage_dict, temp_dict) #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  
+        client=Client()
+        client.send_data(unit_dict, voltage_dict, temp_dict) #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  

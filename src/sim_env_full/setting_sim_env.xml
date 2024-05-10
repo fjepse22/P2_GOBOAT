@@ -12,6 +12,8 @@
 <sim_env_settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<unit_id>1</unit_id>
 	<time_scale>1</time_scale>
+	<total_number_of_batteries>8</total_number_of_batteries>
+	<parallel_configuration>1/2</parallel_configuration>
 	<config_file_battery>config_soc_generic_lead_acid.csv</config_file_battery>
 	<config_file_consumer>config_consumer.csv</config_file_consumer>
 	<schema_file_battery>sch_config_battery.csv</schema_file_battery>

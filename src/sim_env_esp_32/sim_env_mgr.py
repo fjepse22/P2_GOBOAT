@@ -46,11 +46,15 @@ class SimEnvMgr:
             self.data_batt_def = self.settings.get("config_file_battery")
             self.batt_def = self.parser.csv_dict_parser_float(self.data_batt_def)
             self.soc_key  = [key for key in self.batt_def]
+            #Dict for storing unit data for transmission during collection
             self.data_unit = {"id" : self.settings.get("unit_id"), "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : 0, "p_draw" : 0}
+            #Dict for storing battery voltage data for transmission during collection
             self.data_batt_voltage = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, 
                                         "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+            #Dict for storing battery temperature data for transmission during collection
             self.data_batt_temp = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, 
                                     "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+            #Dict for storing battery charge data for calculation
             self.data_batt_charge = {"batt_1" : self.soc_key[0], "batt_2" : self.soc_key[0], "batt_3" : self.soc_key[0], "batt_4": self.soc_key[0], 
                                     "batt_5": self.soc_key[0], "batt_6": self.soc_key[0], "batt_7" : self.soc_key[0], "batt_8" : self.soc_key[0]}
         except Exception as e:

@@ -62,7 +62,7 @@ class PDraw():
                 self.factor = 360
 
             for _ in range(int(i[0]) * self.factor):
-                self.consumption_over_time.append(int(i[2]))
+                self.consumption_over_time.append(int(i[2]) / 3600)
             
             self.factor = 0
     

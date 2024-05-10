@@ -56,13 +56,12 @@ class PDraw():
 
         #Resolves power consumption over time list
         for i in self.profile:
-            match str(i[1]):
-                case "s":
-                    self.factor = 1
-                case "m":
-                    self.factor = 60
-                case "h":
-                    self.factor = 360
+            if str(i[1]) == "s":
+                self.factor = 1
+            elif str(i[1]) == "m":
+                self.factor = 60
+            elif str(i[1]) == "h":
+                self.factor = 360
 
             for _ in range(int(i[0]) * self.factor):
                 self.consumption_over_time.append(int(i[2]))

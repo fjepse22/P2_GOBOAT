@@ -5,8 +5,8 @@
 import time
 from parser_csv_dict import CSVDictParser
 from parser_xml_dict import XMLDictParser
-from sim_data_pos import pos
-from sim_data_loc_time import sim_data_loc_time
+from sim_data_pos import Pos
+from sim_data_loc_time import SimDataLocTime
 from sim_data_pdraw import PDraw
 from sim_data_batt import SimDataBatt
 from logger import Logger
@@ -107,9 +107,9 @@ class SimEnvMgr:
                 self.log.critical(f"An error occurred whilie instantiating: {e}")
 
             #Creating files for updating data
-            self.new_data_pos_lat = {"pos_lat" : pos.move(self.data_unit.get("pos_lat"), 1)}
-            self.new_data_pos_lon = {"pos_lon" : pos.move(self.data_unit.get("pos_lon"), 1)}
-            self.new_data_time = {"time" : sim_data_loc_time.time()}
+            self.new_data_pos_lat = {"pos_lat" : Pos.move(self.data_unit.get("pos_lat"), 1)}
+            self.new_data_pos_lon = {"pos_lon" : Pos.move(self.data_unit.get("pos_lon"), 1)}
+            self.new_data_time = {"time" : SimDataLocTime.time()}
             self.new_data_pdraw = {"p_draw": pd.get(lap_counter)}
             self.new_data_u_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / 8))[0]}
             self.new_data_t_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / 8))[1]}

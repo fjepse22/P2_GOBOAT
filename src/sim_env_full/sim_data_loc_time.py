@@ -4,7 +4,7 @@
 
 import time
 
-class sim_data_loc_time():
+class SimDataLocTime():
     """
     A class to log the time\n
     List of class methods:\n

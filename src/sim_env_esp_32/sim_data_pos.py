@@ -2,7 +2,7 @@
 # Created by : Maiken Lanng
 # Date: 27-04-2024
 
-class pos():
+class Pos():
     """
     A class to move a cordinate 
     List of class methods:\n

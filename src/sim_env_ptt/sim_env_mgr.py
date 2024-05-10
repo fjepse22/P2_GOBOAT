@@ -91,22 +91,21 @@ class SimEnvMgr:
         lap_counter = 0
         run = 1
 
+        #Instantiation of battery and consumer classes
+        try:
+            batt_1 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_2 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_3 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_4 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_5 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_6 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_7 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_8 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
+            pd = PDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
+        except Exception as e:
+            self.log.critical(f"An error occurred whilie instantiating: {e}")
 
         while run != 0:
-            
-            #Instantiation of battery and consumer classes
-            try:
-                batt_1 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_2 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_3 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_4 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_5 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_6 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_7 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                batt_8 = SimDataBatt(self.settings.get("log_file"), self.data_batt_def)
-                pd = PDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
-            except Exception as e:
-                self.log.critical(f"An error occurred whilie instantiating: {e}")
 
             #Creating files for updating data
             self.new_data_pos_lat = {"pos_lat" : pos.move(self.data_unit.get("pos_lat"), 1)}

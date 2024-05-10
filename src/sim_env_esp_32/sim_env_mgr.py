@@ -1,6 +1,8 @@
-# Version 1.00 | Encoding UFT-8
+# Version 1.01 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 01-05-2024
+# Modified by: Ib Leminen Mohr Nielsen
+# Last Modified: 10-05-2024
 
 import time
 from parser_csv_dict import CSVDictParser
@@ -8,6 +10,7 @@ from sim_data_pos import Pos
 from sim_data_loc_time import SimDataLocTime
 from sim_data_pdraw import PDraw
 from sim_data_batt import SimDataBatt
+from esp_tcpclient import Client
 from logger import Logger
 
 class SimEnvMgr:
@@ -50,22 +53,6 @@ class SimEnvMgr:
                                     "batt_5": self.soc_key[0], "batt_6": self.soc_key[0], "batt_7" : self.soc_key[0], "batt_8" : self.soc_key[0]}
         except Exception as e:
             self.log.critical(f"An error occurred whilie initializing sim_env_mgr: {e}")
-
-    def send_data(self):
-        """
-        Sends data to network client\n
-        \n
-        ------------
-        PARAMETERS\n
-        TBD!!!\n
-        \n
-        ------------
-        RETURNS\n
-        TBD!!!\n
-        \n
-        """
-        pass    
-        #dataTx
 
     def run_sim(self) -> None:
         """
@@ -166,4 +153,23 @@ class SimEnvMgr:
             #Updating execution data and mannaging timing
             lap_counter += 1
             time.sleep(1/t_scale)
-            print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+            self.send_data(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
+            #print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+    
+    def send_data(self, unit_dict, voltage_dict, temp_dict):
+        """
+        Sends data to network GoBoat server\n
+        \n
+        ------------
+        PARAMETERS\n
+        unit_dict\n
+        voltage_dict\n
+        temp_dict\n
+        \n
+        ------------
+        RETURNS\n
+        TBD!!!\n
+        \n
+        """
+        client=Client()
+        client.send_data(unit_dict, voltage_dict, temp_dict) #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  

@@ -4,7 +4,7 @@
 
 import time
 
-class sim_data_loc_time():
+class SimDataLocTime():
     """
     A class to log the time\n
     List of class methods:\n
@@ -33,4 +33,4 @@ class sim_data_loc_time():
         Return type is string\n
         """
 
-        return f"{time.localtime()[2]}/{time.localtime()[1]}-{time.localtime()[0]} {time.localtime()[3]}:{time.localtime()[4]}:{ time.localtime()[5]}"
+        return f"{time.localtime()[3]}:{time.localtime()[4]}:{ time.localtime()[5]}"

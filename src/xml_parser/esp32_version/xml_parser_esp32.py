@@ -1,4 +1,4 @@
-#Version 1.01 | Encoding UTF-8
+#Version 1.02 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
@@ -40,7 +40,7 @@ class XmlParser:
     def read_xml(self,xsd_path,unit_dict, voltage_dict, temp_dict):
         """
         If dictionary it will try to create XML first and afterwards reads the XML file and stores it in self.root\n
-        There is three ways to input data, in dictionaries, the path to a XML document or a XML string\n
+        There is two ways to input the xml, either insert the path to a XML document or a XML string\n
         This method should only called by the __init__ method
         \n
         ------------
@@ -59,7 +59,8 @@ class XmlParser:
 
         try:
             create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
-            xml_input=create_xml.generateXML()   
+            xml_input=create_xml.generateXML()
+            self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
         except:
             self.logger.error(f"""File: generate_xml.py\nThe dictionary is not formatted right and XML cannot be created\n""")
             self.valid_xml=False
@@ -68,8 +69,6 @@ class XmlParser:
             self.logger.error(f"""File: packet_controller.py\nThe XML file is not valid according to the XSD schema\n""")
             self.valid_xml=False
             
-        self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
-        
     def get_volt_temp(self):
         """
         Looks for every battery in the xml-file and reads the voltage and temperature from it, and appends it to self.voltage_list and self.temp_list\n
@@ -186,7 +185,8 @@ if __name__ == '__main__':
     ud= {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:10", "p_draw" : 9}
     vd = {"batt_1" : 12.0, "batt_2" : 12.0, "batt_3" : 12.0, "batt_4": 13.0, "batt_5": 15.0, "batt_6": 12.0, "batt_7" : 11.0, "batt_8" : 9.0}
     td = {"batt_1" : 20.0, "batt_2" : 25.0, "batt_3" : 13.0, "batt_4": 2.0, "batt_5": 100.0, "batt_6": -1.0, "batt_7" : 30.0, "batt_8" : 40.0}
-
-    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/", unit_dict=ud, voltage_dict=vd, temp_dict=td) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
+    
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/esp32", unit_dict=ud, voltage_dict=vd, temp_dict=td) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
+    
     print(xml_parser)

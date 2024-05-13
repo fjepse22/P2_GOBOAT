@@ -9,7 +9,7 @@ import selectors
 import json
 import logging
 import time
-#import sql_insert_data as sql
+import sql_insert_data as sql
 from xml_parser import XmlParser
 
 """

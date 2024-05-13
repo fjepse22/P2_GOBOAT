@@ -56,7 +56,11 @@ class XmlParser:
         Return None\n
         """
         self.valid_xml=True
+
         if type(xml_path)!=type(""):
+            if xml_path!=None:
+                self.logger.error(f"""File: xml_parser.py\nErrorType: TypeError\nThe type is {type(xml_path)}, will try using dicts\n""")
+
             try:
                 create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
                 xml_path=create_xml.generateXML()
@@ -194,6 +198,6 @@ if __name__ == '__main__':
     vd = {"batt_1" : 12, "batt_2" : 12, "batt_3" : 12, "batt_4": 13, "batt_5": 15, "batt_6": 12, "batt_7" : 11, "batt_8" : 9}
     td = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
 
-    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/", unit_dict=ud, voltage_dict=vd, temp_dict=td, xml_path=None) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/", unit_dict=ud, voltage_dict=vd, temp_dict=td, xml_path=1) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
     print(xml_parser)

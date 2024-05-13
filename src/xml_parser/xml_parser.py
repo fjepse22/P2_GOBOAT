@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 import logging
 from datetime import datetime
 from packet_controller import validate
-from generate_xml import CreateXML
 
 class XmlParser:
     """
@@ -25,7 +24,7 @@ class XmlParser:
 
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd", directory="", unit_dict={},voltage_dict={},temp_dict={},xml_path=None):
+    def __init__(self,xsd_path="sch_status_data.xsd", directory="", xml_input="status_data.xml"):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -35,18 +34,18 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml((xsd_path),unit_dict, voltage_dict, temp_dict, xml_path) #Reads the XML file and stores it in self.root
+        self.read_xml((xsd_path), xml_input) #Reads the XML file and stores it in self.root
         
-    def read_xml(self,xsd_path,unit_dict, voltage_dict, temp_dict, xml_path=None):
+    def read_xml(self,xsd_path,xml_input):
         """
-        If dictionary it will try to create XML first and afterwards reads the XML file and stores it in self.root\n
-        There is three ways to input data, in dictionaries, the path to a XML document or a XML string\n
+        Reads the XML file and stores it in self.root\n
+        The XML-file can eithe be found via a file directory or recieved via xml\n
         This method should only called by the __init__ method
         \n
         ------------
         PARAMETERS\n
         xds_path = The path of the file to check xml-integrety.\n
-        xml_path = The path to the xml-file or the string in xml-format"\n
+        xml_input = The path to the xml-file or the string in xml-format"\n
     
         self:\n
         ------------
@@ -57,28 +56,22 @@ class XmlParser:
         """
         self.valid_xml=True
 
-        if type(xml_path)!=type(""):
-            if xml_path!=None:
-                self.logger.error(f"""File: xml_parser.py\nErrorType: TypeError\nThe type is {type(xml_path)}, will try using dicts\n""")
-
-            try:
-                create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
-                xml_path=create_xml.generateXML()
-            except:
-                self.logger.error(f"""File: generate_xml.py\nErrorType: CreateXML\nThe dictionary is not formatted right\n""")
-                self.valid_xml=False
+        if type(xml_input)!=type(""):
+            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_input)} and not a string""")
+            self.valid_xml=False
         
         if self.valid_xml==True:
             try:
                 try:
-                    self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
+                    self.root = ET.fromstring(open(xml_input).read()) #Reads the XML file and stores it in root.
+                # if xml_input is not a path but a string, the program wil read the string as an xml-file.
                 except:
-                    self.root = ET.fromstring(xml_path) #Reads the XML data and stores it in root.
+                    self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
             except ET.ParseError:
                 self.logger.error(f"""File: xml_parser.py\nErrorType: ET.ParseError\nThe string is not in XML format\n""")
                 self.valid_xml=False
 
-            if self.valid_xml==True and not validate(xsd_path,xml_path):
+            if self.valid_xml==True and not validate(xsd_path,xml_input):
                 self.logger.error(f"""File: packet_controller.py\nThe XML file is not valid according to the XSD schema\n""")
                 self.valid_xml=False
          
@@ -184,6 +177,7 @@ class XmlParser:
         Return None\n
         """
         return(f"""
+        Valid XML = {self.valid_xml}
         Voltage for battery {self.voltage_list}
         Temperature for battery {self.temp_list}
         Boat ID = {self.boat_id}
@@ -194,10 +188,6 @@ class XmlParser:
         """)
 
 if __name__ == '__main__':
-    ud= {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:10", "p_draw" : 0}
-    vd = {"batt_1" : 12, "batt_2" : 12, "batt_3" : 12, "batt_4": 13, "batt_5": 15, "batt_6": 12, "batt_7" : 11, "batt_8" : 9}
-    td = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
-
-    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/", unit_dict=ud, voltage_dict=vd, temp_dict=td, xml_path=1) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/",) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
     print(xml_parser)

@@ -1,8 +1,8 @@
-#Version 1.00 | Encoding UTF-8
+#Version 1.01 | Encoding UTF-8
 #Created 13-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 10-05-2024
+#Last modified 13-05-2024
 
 import xml.etree.ElementTree as ET
 import logging
@@ -25,7 +25,7 @@ class XmlParser:
 
     """
 
-    def __init__(self,xsd_path="sch_status_data.xsd", directory="", unit_dict={},voltage_dict={},temp_dict={}):
+    def __init__(self,xsd_path="sch_status_data.xsd", directory="", unit_dict={},voltage_dict={},temp_dict={},xml_path=None):
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
@@ -35,12 +35,12 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml((xsd_path),unit_dict, voltage_dict, temp_dict) #Reads the XML file and stores it in self.root
+        self.read_xml((xsd_path),unit_dict, voltage_dict, temp_dict, xml_path) #Reads the XML file and stores it in self.root
         
-    def read_xml(self,xsd_path,unit_dict, voltage_dict, temp_dict):
+    def read_xml(self,xsd_path,unit_dict, voltage_dict, temp_dict, xml_path=None):
         """
-        Reads the XML file and stores it in self.root\n
-        The XML-file can eithe be found via a file directory or recieved via xml\n
+        If dictionary it will try to create XML first and afterwards reads the XML file and stores it in self.root\n
+        There is three ways to input data, in dictionaries, the path to a XML document or a XML string\n
         This method should only called by the __init__ method
         \n
         ------------
@@ -56,22 +56,18 @@ class XmlParser:
         Return None\n
         """
         self.valid_xml=True
-        try:
-            create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
-            xml_path=create_xml.generateXML()
-        except:
-            self.logger.error(f"""File: generate_xml.py\nErrorType: CreateXML\nThe dictionary is not formatted right\n""")
-            self.valid_xml=False
-
-        if self.valid_xml==False and type(xml_path)!=type(""):
-            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_path)} and not a string\n""")
-            self.valid_xml=False
+        if type(xml_path)!=type(""):
+            try:
+                create_xml=CreateXML(unit_dict, voltage_dict, temp_dict)
+                xml_path=create_xml.generateXML()
+            except:
+                self.logger.error(f"""File: generate_xml.py\nErrorType: CreateXML\nThe dictionary is not formatted right\n""")
+                self.valid_xml=False
         
         if self.valid_xml==True:
             try:
                 try:
                     self.root = ET.fromstring(open(xml_path).read()) #Reads the XML file and stores it in root.
-                # if xml_path is not a path but a string, the program wil read the string as an xml-file.
                 except:
                     self.root = ET.fromstring(xml_path) #Reads the XML data and stores it in root.
             except ET.ParseError:
@@ -194,6 +190,10 @@ class XmlParser:
         """)
 
 if __name__ == '__main__':
-    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/") #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
+    ud= {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:10", "p_draw" : 0}
+    vd = {"batt_1" : 12, "batt_2" : 12, "batt_3" : 12, "batt_4": 13, "batt_5": 15, "batt_6": 12, "batt_7" : 11, "batt_8" : 9}
+    td = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/", unit_dict=ud, voltage_dict=vd, temp_dict=td, xml_path=None) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
     print(xml_parser)

@@ -1,14 +1,15 @@
-#Version 1.00 | Encoding UTF-8
+#Version 1.01 | Encoding UTF-8
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 10-05-2024
+#Last modified 13-05-2024
 
 import socket
 import selectors
 import json
 import logging
-import sql_insert_data as sql
+import time
+#import sql_insert_data as sql
 from xml_parser import XmlParser
 
 """
@@ -104,11 +105,17 @@ class SQL_socket:
         """
         
         data = b''
+        start_time = time.time()
         while b"EOF" not in data: # runs while EOF(end of file) is not in the data, which is recieved last from the client. 
             try:
                 data += self.conn.recv(self.BUFFER_SIZE) # used try except to avoid blocking error
             except BlockingIOError:
                 continue  
+
+            if start_time + 3 < time.time():
+                self.logger.error(f"""File: TCPSERVER.py\nThe connection has timed out\n""")
+                break
+
         self.sel.unregister(self.conn)
         self.conn.close()
 
@@ -158,7 +165,6 @@ class SQL_socket:
         if safe_data==True:
             xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
             xml_parser.get_all_data()
-            print(xml_parser)
 
             if xml_parser.valid_xml == True:
                 Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
@@ -190,7 +196,7 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 if __name__ == "__main__":
-    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2')
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2', directory="/Users/ibleminen/Downloads/test/rasp")
     print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
     test.run()
 

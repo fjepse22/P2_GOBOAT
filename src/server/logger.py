@@ -53,7 +53,7 @@ class logger:
 
         #Opening and parsing json file
         try:
-            with open("/home/Gruppe250/test/log_config.json") as file_in:
+            with open("log_config.json") as file_in:
                 config = json.load(file_in)
         #Prints error message to terminal, if file is not found, since log is not yet instantiated
         except FileNotFoundError as e:

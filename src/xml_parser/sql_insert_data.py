@@ -1,15 +1,15 @@
 # See https://mariadb-corporation.github.io/mariadb-connector-python/usage.html for documentation about the mariadb module.
-# Version 1.25
+# Version 1.26
 # Writen by Frederik B. B. Jepsen
 # Created 13-04-2024
-# last modified: 13-05-2024
+# last modified: 14-05-2024
 # modified by: Frederik Jepsen
 
 # TESTER PULL REQUEST
 
 import mariadb
-import logging
-import xml_parser as xml_p
+from  logger import log
+import xml_parser_esp32 as xml_p
 
 class DatabaseConnection:
     """
@@ -21,9 +21,9 @@ class DatabaseConnection:
 
     """
   
-    def __init__(self,user,password,host,port=3306,database='Goboat', directory='',log_level = logging.ERROR):
-        self.logger = logging.getLogger(__name__) # This is used to log the errors that might occur.
-        self.logging=logging.basicConfig(filename=(directory+'/sql_insert.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=log_level) #This is used to format the log, and what information it should contain.
+    def __init__(self,user,password,host,port=3306,database='Goboat', directory='',log_level = None):
+       # self.logger = logging.getLogger(__name__) # This is used to log the errors that might occur.
+       # self.logging=logging.basicConfig(filename=(directory+'/sql_insert.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=log_level) #This is used to format the log, and what information it should contain.
 
 
         self.user = user
@@ -59,9 +59,9 @@ class DatabaseConnection:
 
         try:
             connection = mariadb.connect(user = self.user, password = self.password,host = self.host,port = self.port, database = self.database)
-            self.logger.debug(f'Connected sucessfully to {self.database} with user {self.user}')
+            log.debug(f'Connected sucessfully to {self.database} with user {self.user}')
         except mariadb.Error as e:
-            self.logger.error(f'Error connecting to MariaDB Platform: {e}')
+            log.error(f'Error connecting to MariaDB Platform: {e}')
         # Get Cursor
         cursor = connection.cursor()
 
@@ -90,7 +90,7 @@ class DatabaseConnection:
             fetch = cursor.fetchall()
             batteries = fetch
         except mariadb.Error as e:
-            self.logger.error(f'Could not find batteries for the boat with ID {boat_ID}: {e}')
+            log.error(f'Could not find batteries for the boat with ID {boat_ID}: {e}')
             cursor.close()
             connection.close()
             return
@@ -102,7 +102,7 @@ class DatabaseConnection:
             pass    
         else:
             # raise Exception(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
-            self.logger.error(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
+            log.error(f'The number of batteries on boat {boat_ID} in the database does not correspond to the amount of batteries comming from the xml-file')
             cursor.close()
             connection.close()
             return
@@ -111,7 +111,7 @@ class DatabaseConnection:
             cursor.execute(insert_data)
                 
         except mariadb.Error as e:
-            self.logger.error(f"insert into table boat_log failed: {e}" )
+            log.error(f"insert into table boat_log failed: {e}" )
             cursor.close()
             connection.close()
             return
@@ -121,7 +121,7 @@ class DatabaseConnection:
             fetch = cursor.fetchall()
             Data_ID = fetch[0][0]
         except mariadb.Error as e:
-            self.logger.error(f'select statement failed could not find Data_ID {Data_ID} in table boat_log {e}')
+            log.error(f'select statement failed could not find Data_ID {Data_ID} in table boat_log {e}')
             cursor.close()
             connection.close()
             return
@@ -139,11 +139,11 @@ class DatabaseConnection:
                 
         # Shows the dublicate entry as boat_ID compined with time.
         except mariadb.IntegrityError as e:
-            self.logger.error(f"failed to insert data to the voltage table {e} with the boat_ID: {boat_ID} and time {date}")
+            log.error(f"failed to insert data to the voltage table {e} with the boat_ID: {boat_ID} and time {date}")
             cursor.close()
             connection.close()
         except mariadb.Error as e:
-            self.logger.error(f"failed to insert data to the voltage table {e}")
+            log.error(f"failed to insert data to the voltage table {e}")
             cursor.close()
             connection.close()
             return
@@ -154,16 +154,16 @@ class DatabaseConnection:
         # free resources
         cursor.close()
         connection.close()
-        self.logger.info(f'Data from xml-file inserted to database with Data_ID: {Data_ID}, Boat_ID: {boat_ID} log_time: {date}')
+        log.info(f'Data from xml-file inserted to database with Data_ID: {Data_ID}, Boat_ID: {boat_ID} log_time: {date}')
 
 if __name__ == '__main__':
 
-    ud= {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:11", "p_draw" : 0}
+    ud= {"id" : 2, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:11", "p_draw" : 0}
     vd = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
     td = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
 
     # Testserver on Frederik's own computer.
-    Goboat = DatabaseConnection(user="frederik",password="password",host="127.0.0.1",database='goboatv2',directory="C:/Users/frede/Downloads",log_level = logging.INFO)
+    Goboat = DatabaseConnection(user="frederik",password="password",host="127.0.0.1",database='goboatv2',directory="C:/Users/frede/Downloads")
     data = xml_p.XmlParser(directory="C:/Users/frede/Downloads", unit_dict=ud, voltage_dict=vd, temp_dict=td)
     data.get_all_data()
 

@@ -27,11 +27,23 @@ class TCPClient:
         Return type is bytes.\n
         """
         
-        with open(file, "rb") as message:
-            message = message.read()
+        try:
+            try: 
+                from xml_module import Xml
+                xml_module=Xml()
+                message=bytes(xml_module.generate_xml(ID=1, PositionLat=33, PositionLon=-144, Draw=9), 'utf-8')
+
+            except ModuleNotFoundError:
+                with open(file, "rb") as message:
+                    message = message.read()
+
+        except FileNotFoundError:
+            print("no data file found and no xml module found, please provide data file or xml module")
+            exit()
+        
         return message
 
-    def send_data(self, file="status_data.xml", SERVER_IP="192.168.1.10", SERVER_PORT=8888):
+    def send_data(self, file="status_data.xml", SERVER_IP="192.168.1.10", SERVER_PORT=9999):
         """
         Sends data to the server.
         \n
@@ -62,6 +74,7 @@ class TCPClient:
             header=len(message)
             s.send(header.to_bytes(3, 'big'))
             s.send(message)
+            print(header)
 
         except OverflowError:
             print(f"{OverflowError}, the message is too long")
@@ -74,4 +87,4 @@ class TCPClient:
 
 if __name__ == "__main__":
     client = TCPClient()
-    client.send_data(SERVER_IP="192.168.1.140")# Change the IP to the IP of the server
+    client.send_data(SERVER_IP="192.168.1.140", file="status_data.xml")# Change the IP to the IP of the server

@@ -7,6 +7,7 @@
 import socket
 import selectors
 import logging
+from logger import log
 from xml_parser import XmlParser
 import sql_insert_data as sql
 
@@ -58,8 +59,8 @@ class SQL_socket:
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
 
         #Creates logger
-        self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        #self.logger = logging.getLogger(__name__)
+        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
 
         #This start the the listening process
 

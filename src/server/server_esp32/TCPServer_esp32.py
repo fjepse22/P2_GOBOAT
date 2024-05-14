@@ -7,6 +7,7 @@
 import socket
 import selectors
 import json
+import time
 from logger import log
 import sql_insert_data as sql
 from xml_parser_esp32 import XmlParser
@@ -102,10 +103,18 @@ class SQL_socket:
         data=b''
         header = self.conn.recv(3)
         log.debug(f"header length {int.from_bytes(header, 'big')}")
-
+        
+        start_time = time.time()
         while len(data) < int.from_bytes(header, 'big'):
-            data += self.conn.recv(int.from_bytes(header, 'big'))
-
+            try:
+                data += self.conn.recv(int.from_bytes(header, 'big'))
+            except BlockingIOError:
+                continue
+            
+            if time.time()-start_time > 1:
+                log.error("Timeout as data is not recieved in 1 second.")
+                break
+          
         log.debug(f"Data length {len(data)}")
 
         self.sel.unregister(self.conn)

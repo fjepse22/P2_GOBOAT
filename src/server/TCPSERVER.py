@@ -6,9 +6,9 @@
 
 import socket
 import selectors
-import logging
 from logger import log
 from xml_parser import XmlParser
+import time
 import sql_insert_data as sql
 
 """
@@ -23,7 +23,7 @@ class SQL_socket:
     \n
     
     List of class methods:\n
-    - __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None): Initialises the object and starts the process to listen\n
+    - __init__(self,HOST='',PORT=9999,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None): Initialises the object and starts the process to listen\n
 
     - __accept(self,sock, mask): Used to establish a connection to a client, that sends a xml-file.\n
 
@@ -34,7 +34,7 @@ class SQL_socket:
     - run(self): This method calls the loop that will constantly listen for something on the specified port self.PORT\n
     """
 
-    def __init__(self,HOST='',PORT=8888,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None, directory="/home/Gruppe250/test",database='goboatv2') -> None:
+    def __init__(self,HOST='',PORT=9999,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None, directory="/home/Gruppe250/Server",database='goboatv2') -> None:
         """
          Initialises the object and starts the process to listen
         """
@@ -57,10 +57,6 @@ class SQL_socket:
         self.sock.listen(100)
         self.sock.setblocking(False)
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
-
-        #Creates logger
-        #self.logger = logging.getLogger(__name__)
-        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
 
         #This start the the listening process
 
@@ -103,15 +99,24 @@ class SQL_socket:
         Return None\n
         """
         
-        data = b''
-
+        data=b''
         header = self.conn.recv(3)
+
+        log.debug(f"header length {int.from_bytes(header, 'big')}")
+        start_time = time.time()
         while len(data) < int.from_bytes(header, 'big'):
-            data += self.conn.recv(int.from_bytes(header, 'big'))
-    
+            try:
+                data += self.conn.recv(int.from_bytes(header, 'big'))
+            except BlockingIOError:
+                continue
+            
+            if time.time() - start_time > 1:
+                break
+            
+        log.debug(f"Data length {len(data)}")
+
         self.sel.unregister(self.conn)
         self.conn.close()
-        
         # Creates a XML-file out of the data string and removes the end of file string.
 
         self.__insert_data(str(data, 'utf-8'))
@@ -135,12 +140,14 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
+        log.info("processing data.....")
 
         xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_input=str(xml), directory=self.directory) #inserets the xml data into the xml_parser from the client.
 
         xml_parser.get_all_data()
-        print(xml_parser)
+        
         if xml_parser.valid_xml == True:
+            log.info(f"XML is valid")
             Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
             input = xml_parser
 

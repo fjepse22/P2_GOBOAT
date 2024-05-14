@@ -6,6 +6,7 @@
 
 import xml.etree.ElementTree as ET
 import logging
+from logger import log
 from datetime import datetime
 from packet_controller_esp32 import validate
 from generate_xml import CreateXML
@@ -26,8 +27,8 @@ class XmlParser:
     """
 
     def __init__(self,xsd_path="sch_status_data.xsd", directory="", unit_dict={},voltage_dict={},temp_dict={}):
-        self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        #self.logger = logging.getLogger(__name__)
+        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
         self.watt = float(0) #Based on Draw from xml.
@@ -62,11 +63,11 @@ class XmlParser:
             xml_input=create_xml.generateXML()
             self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
         except:
-            self.logger.error(f"""File: generate_xml.py\nThe dictionary is not formatted right and XML cannot be created\n""")
+            log.error(f"""File: generate_xml.py: The dictionary is not formatted right and XML cannot be created""")
             self.valid_xml=False
         
         if self.valid_xml==True and not validate(xsd_path,xml_input):
-            self.logger.error(f"""File: packet_controller.py\nThe XML file is not valid according to the XSD schema\n""")
+            log.error(f"""File: packet_controller.py: The XML file is not valid according to the XSD schema""")
             self.valid_xml=False
             
     def get_volt_temp(self):

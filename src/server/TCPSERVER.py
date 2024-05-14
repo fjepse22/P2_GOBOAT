@@ -2,15 +2,13 @@
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 13-05-2024
+#Last modified 14-05-2024
 
 import socket
 import selectors
-import json
 import logging
-import time
-import sql_insert_data as sql
 from xml_parser import XmlParser
+import sql_insert_data as sql
 
 """
 This needs to be event based with a que system, in order to ensure that all data gets into the database
@@ -50,7 +48,7 @@ class SQL_socket:
         self.password = password                # Password to the database
         self.host = host                        # Where the database hosts the database
         self.directory = directory              # Directory to the folder
-        self.database = database                # The name of the database
+        self.database = database                #the name of the database
 
         #Creates sockets
         self.sock = socket.socket()
@@ -62,7 +60,7 @@ class SQL_socket:
         #Creates logger
         self.logger = logging.getLogger(__name__)
         self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
-        
+
         #This start the the listening process
 
     def __accept(self,sock, mask):
@@ -105,32 +103,23 @@ class SQL_socket:
         """
         
         data = b''
-        start_time = time.time()
-        while b"EOF" not in data: # runs while EOF(end of file) is not in the data, which is recieved last from the client. 
-            try:
-                data += self.conn.recv(self.BUFFER_SIZE) # used try except to avoid blocking error
-            except BlockingIOError:
-                continue  
 
-            if start_time + 3 < time.time():
-                self.logger.error(f"""File: TCPSERVER.py\nThe connection has timed out\n""")
-                break
-
+        header = self.conn.recv(3)
+        while len(data) < int.from_bytes(header, 'big'):
+            data += self.conn.recv(int.from_bytes(header, 'big'))
+    
         self.sel.unregister(self.conn)
         self.conn.close()
+        
+        # Creates a XML-file out of the data string and removes the end of file string.
 
-        self.__insert_data(data)
-
-        # Threading for inserting data into database is not yet implemented
-
-        #event = threading.Event(target=self.insert_data, args=(str(xml_file),),name=f'Insert_xml_thread_{self.CONN_COUNTER}')
-        #event.set()
+        self.__insert_data(str(data, 'utf-8'))
         self.CONN_COUNTER +=1
 
 
 
 
-    def __insert_data(self,data):
+    def __insert_data(self,xml):
         """
         This private method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method.\n
         \n
@@ -145,32 +134,16 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
-        safe_data = True
-        try:
-            data=data[:-4].split(b'#')
-        except TypeError:
-            safe_data=False
-            self.logger.error(f"""File: TCPSERVER.py\nErrorType: TypeError\nThe type is {type(data)}\n""")
-        
-        if safe_data==True:
-            try:
-                unit_dict=json.loads(data[0].decode('utf-8'))
-                voltage_dict=json.loads(data[1].decode('utf-8'))
-                temp_dict=json.loads(data[2].decode('utf-8'))
 
-            except json.decoder.JSONDecodeError:
-                safe_data=False
-                self.logger.error(f"""File: TCPSERVER.py\nErrorType: json.decoder.JSONDecodeError\nCouldn't convert bytes into dictionary\n""")
-        
-        if safe_data==True:
-            xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
-            xml_parser.get_all_data()
+        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_input=str(xml), directory=self.directory) #inserets the xml data into the xml_parser from the client.
 
-            if xml_parser.valid_xml == True:
-                Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
-                input = xml_parser
+        xml_parser.get_all_data()
+        print(xml_parser)
+        if xml_parser.valid_xml == True:
+            Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
+            input = xml_parser
 
-                Goboat.insert_boat_data(boat_ID=input.boat_id,date=input.date,lok_lat=input.lok_lat,lok_long=input.lok_long,temperatures=input.temp_list,watt=input.watt,voltage_array=input.voltage_list)
+            Goboat.insert_boat_data(boat_ID=input.boat_id,date=input.date,lok_lat=input.lok_lat,lok_long=input.lok_long,temperatures=input.temp_list,watt=input.watt,voltage_array=input.voltage_list)
 
 
     def run(self):
@@ -196,7 +169,7 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 if __name__ == "__main__":
-    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2', directory="/Users/ibleminen/Downloads/test/rasp")
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2')
     print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
     test.run()
 

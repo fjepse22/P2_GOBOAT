@@ -9,7 +9,7 @@
 
 import mariadb
 from  logger import log
-import xml_parser_esp32 as xml_p
+import xml_parser as xml_p
 
 class DatabaseConnection:
     """

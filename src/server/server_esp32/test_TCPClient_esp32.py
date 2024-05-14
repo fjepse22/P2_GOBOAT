@@ -1,6 +1,7 @@
 """"test client, used together with TCPSERVER.py to test the server"""
 from socket import *
 import json
+import time
 
 class TCPClient:
     def __init__(self):
@@ -56,9 +57,14 @@ class TCPClient:
 
 
 if __name__ == "__main__":
-    unit_dict = {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : "14:12:10", "p_draw" : 0}
+    local_time = time.ctime(time.time())
+    
+    unit_dict = {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : local_time[11:-5], "p_draw" : 1}
     voltage_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
     temp_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
     
-    client = TCPClient()
-    client.send_data(unit_dict, voltage_dict, temp_dict, SERVER_IP="192.168.1.140")# Change the IP to the IP of the server
+    #client = TCPClient()
+    for i in range(10):
+        client = TCPClient()
+        client.send_data(unit_dict, voltage_dict, temp_dict, SERVER_IP="192.168.1.10")# Change the IP to the IP of the server
+

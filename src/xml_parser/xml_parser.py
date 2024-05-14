@@ -6,6 +6,7 @@
 
 import xml.etree.ElementTree as ET
 import logging
+from logger import log
 from datetime import datetime
 from packet_controller import validate
 
@@ -25,8 +26,8 @@ class XmlParser:
     """
 
     def __init__(self,xsd_path="sch_status_data.xsd", directory="", xml_input="status_data.xml"):
-        self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        #self.logger = logging.getLogger(__name__)
+        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         self.voltage_list = []  #Voltage from each battery.
         self.temp_list = []  #Temperature of each battery.
         self.watt = float(0) #Based on Draw from xml.
@@ -57,7 +58,7 @@ class XmlParser:
         self.valid_xml=True
 
         if type(xml_input)!=type(""):
-            self.logger.error(f"""File: xml_parser.py\nThe data is {type(xml_input)} and not a string""")
+            log.error(f"""File: xml_parser.py: The data is {type(xml_input)} and not a string""")
             self.valid_xml=False
         
         if self.valid_xml==True:
@@ -68,11 +69,11 @@ class XmlParser:
                 except:
                     self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
             except ET.ParseError:
-                self.logger.error(f"""File: xml_parser.py\nErrorType: ET.ParseError\nThe string is not in XML format\n""")
+                log.error(f"""File: xml_parser.py: ErrorType: ET.ParseError\nThe string is not in XML format""")
                 self.valid_xml=False
 
             if self.valid_xml==True and not validate(xsd_path,xml_input):
-                self.logger.error(f"""File: packet_controller.py\nThe XML file is not valid according to the XSD schema\n""")
+                log.error(f"""File: packet_controller.py: The XML file is not valid according to the XSD schema""")
                 self.valid_xml=False
          
     def get_volt_temp(self):

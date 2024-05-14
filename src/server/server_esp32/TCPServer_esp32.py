@@ -7,9 +7,7 @@
 import socket
 import selectors
 import json
-import logging
 from logger import log
-import time
 import sql_insert_data as sql
 from xml_parser_esp32 import XmlParser
 
@@ -59,11 +57,6 @@ class SQL_socket:
         self.sock.listen(100)
         self.sock.setblocking(False)
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
-
-        #Creates logger
-        # No longer used
-        #self.logger = logging.getLogger(__name__)
-        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         
         #This start the the listening process
 
@@ -108,9 +101,13 @@ class SQL_socket:
         
         data=b''
         header = self.conn.recv(3)
+        log.debug(f"header length {int.from_bytes(header, 'big')}")
+
         while len(data) < int.from_bytes(header, 'big'):
             data += self.conn.recv(int.from_bytes(header, 'big'))
-    
+
+        log.debug(f"Data length {len(data)}")
+
         self.sel.unregister(self.conn)
         self.conn.close()
 
@@ -122,7 +119,6 @@ class SQL_socket:
 
 
     def __insert_data(self,data):
-        print("")
         """
         This private method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method.\n
         \n
@@ -137,6 +133,7 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
+        log.info("processing data.....")
         safe_data = True
         try:
             data=data.split(b'#')
@@ -145,6 +142,8 @@ class SQL_socket:
             log.error(f"""File: TCPSERVER.py ErrorType: TypeError: The type is {type(data)}""")
         
         if safe_data==True:
+            log.debug(f"Data has been split")
+
             try:
                 unit_dict=json.loads(data[0].decode('utf-8'))
                 voltage_dict=json.loads(data[1].decode('utf-8'))
@@ -153,12 +152,14 @@ class SQL_socket:
             except json.decoder.JSONDecodeError:
                 safe_data=False
                 log.error(f"""File: TCPSERVER.py ErrorType: json.decoder.JSONDecodeError Couldn't convert bytes into dictionary""")
-        
+    
         if safe_data==True:
+            log.debug(f"Data is being converted into dictionaries")
             xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
             xml_parser.get_all_data()
 
             if xml_parser.valid_xml == True:
+                log.info(f"XML is valid")
                 Goboat = sql.DatabaseConnection(user=self.user,password=self.password,host=self.host, port=3306,database=self.database, directory=self.directory) # establish connection to the database
                 input = xml_parser
 
@@ -188,7 +189,7 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 if __name__ == "__main__":
-    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2',directory="/home/Gruppe250/test")
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2')
     print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
     test.run()
 

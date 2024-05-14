@@ -8,6 +8,7 @@ import socket
 import selectors
 import json
 import logging
+from logger import log
 import time
 import sql_insert_data as sql
 from xml_parser_esp32 import XmlParser
@@ -60,8 +61,9 @@ class SQL_socket:
         self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
 
         #Creates logger
-        self.logger = logging.getLogger(__name__)
-        self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
+        # No longer used
+        #self.logger = logging.getLogger(__name__)
+        #self.logging=logging.basicConfig(filename=(directory+'/error.log'), format='%(asctime)s, %(levelname)s, %(message)s', encoding='utf-8', level=logging.DEBUG)
         
         #This start the the listening process
 
@@ -140,17 +142,17 @@ class SQL_socket:
             data=data.split(b'#')
         except TypeError:
             safe_data=False
-            self.logger.error(f"""File: TCPSERVER.py\nErrorType: TypeError\nThe type is {type(data)}\n""")
+            log.error(f"""File: TCPSERVER.py ErrorType: TypeError: The type is {type(data)}""")
         
         if safe_data==True:
             try:
                 unit_dict=json.loads(data[0].decode('utf-8'))
                 voltage_dict=json.loads(data[1].decode('utf-8'))
                 temp_dict=json.loads(data[2].decode('utf-8'))
-
+                
             except json.decoder.JSONDecodeError:
                 safe_data=False
-                self.logger.error(f"""File: TCPSERVER.py\nErrorType: json.decoder.JSONDecodeError\nCouldn't convert bytes into dictionary\n""")
+                log.error(f"""File: TCPSERVER.py ErrorType: json.decoder.JSONDecodeError Couldn't convert bytes into dictionary""")
         
         if safe_data==True:
             xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
@@ -186,7 +188,14 @@ class SQL_socket:
                 callback(key.fileobj, mask)
 
 if __name__ == "__main__":
-    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2')
+    test = SQL_socket(user="testuser",password="testpassword", host="127.0.0.1",database='goboatv2',directory="/home/Gruppe250/test")
     print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
     test.run()
 
+"""
+# Test on Frederik's pc
+if __name__ == "__main__":
+    test = SQL_socket(user="frederik",password="password", host="127.0.0.1",database='goboatv2',directory="C:/Users/frede/Downloads")
+    print('* TCP Server listening for incoming connections in port {}'.format(test.PORT))
+    test.run()
+"""

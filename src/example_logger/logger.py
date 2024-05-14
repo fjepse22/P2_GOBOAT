@@ -1,10 +1,16 @@
 #Version 1.00 | Encoding UTF-8
 #Created by: Jesper Hammer
 #Date: 26/04-2024
+# Modified 14-05-2024
+# Modified by: Frederik B. B. Jepsen
 
 import json
 import logging.config
 import logging
+
+# use 
+# from logging import log 
+# in order to use the log functoin here.
 
 class logger:
     """
@@ -61,4 +67,4 @@ logger_setup = logger("dev")
 logger_setup.setup()
 
 log = logging.getLogger(logger_setup.__logger_type__)
-log.info("info test")
+#log.info("info test")

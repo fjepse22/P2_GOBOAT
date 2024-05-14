@@ -4,6 +4,7 @@
 
 import json
 import logging.config
+import logging
 
 class logger:
     """
@@ -48,7 +49,6 @@ class logger:
         try:
             with open("log_config.json") as file_in:
                 config = json.load(file_in)
-                print(config)
         #Prints error message to terminal, if file is not found, since log is not yet instantiated
         except FileNotFoundError as e:
             print("Configuration file for logging module not found. Exiting.\n %s", e)
@@ -57,5 +57,8 @@ class logger:
         logging.config.dictConfig(config)
         return self.__logger_type__
     
-lo = logger("dev")
-lo.setup()
+logger_setup = logger("dev")
+logger_setup.setup()
+
+log = logging.getLogger(logger_setup.__logger_type__)
+log.info("info test")

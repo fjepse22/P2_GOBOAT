@@ -2,12 +2,21 @@
 
 # Writen by Magnus F. Kavin
 # Created 23-04-2024
-# last modified: 07-05-2024
+# last modified: 15-05-2024
 # last modified by: Magnus Kavin
+
+"""
+This is a GUI module. it connects to a database, imports relevant data from a database 
+by wirelessly connecting to a server and displays it in a graphical interface.
+
+This module takes no direct inputs from the user, and instead gets all necessary inputs from the database.
+"""
+
+
 
 import mariadb
 import sys
-
+import datetime #not actively used, but utilized for testing
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -35,7 +44,8 @@ class DatabaseConnection:
         self.host = host
         self.port = port
         self.database = database
-
+        
+        
 
     def get_boats(self):
         """
@@ -74,12 +84,15 @@ class DatabaseConnection:
         Returns a dictionary 
 
         output example:
-        {'boat1': 
-            {'Latitude': 33.0, 
+        {
+        'boat1': 
+            {
+            'Latitude': 33.0, 
             'Longitude': -144.0, 
             'Watt': 2.3, 
             'Last updated': datetime.datetime(2024, 5, 6, 14, 2, 46), 
-            'Batteries':   {'bat11': {'Voltage': 12.0, 'Temperature': 21.0}, 
+            'Batteries':   {
+                            'bat11': {'Voltage': 12.0, 'Temperature': 21.0}, 
                             'bat12': {'Voltage': 12.0, 'Temperature': 21.0}, 
                             'bat13': {'Voltage': 12.0, 'Temperature': 21.0}, 
                             'bat14': {'Voltage': 12.0, 'Temperature': 21.0}, 
@@ -88,7 +101,7 @@ class DatabaseConnection:
                             'bat17': {'Voltage': 12.0, 'Temperature': 21.0}, 
                             'bat18': {'Voltage': 12.0, 'Temperature': 21.0}
                             }
-            },
+            }
         }
         """
 
@@ -152,7 +165,7 @@ class DatabaseConnection:
 #GUI app class is defined
 class BoatGUI(App):
     """
-    BoatGUI(boat_list)
+    BoatGUI(boat_list, boat_list, dict_boats)
 
     The BoatGUI class contains the main window for the user interface. The methods included are dedicated to building and formatting the gui window. 
     """
@@ -190,11 +203,11 @@ class BoatGUI(App):
             
             
             #makes button red in certain error states. Current error state is if watt is less than two. More error states can be added
-            if self.dict_boats[boat]['Watt']<2:
+            if avrg_temp_and_volt[0]>80 or self.dict_boats[boat]['Watt']<2:
                 colour = (1, 0, 0, 1)  # Red
 
 
-            elif avrg_temp_and_volt[1]<4: #if voltage is less than six
+            elif  avrg_temp_and_volt[1]<6: #temp greater than 80 or if voltage is less than six
                 colour = (1, 1, 0, 1)  # Yellow                
             
             
@@ -203,7 +216,7 @@ class BoatGUI(App):
                 colour = (0, 1, 0, 1)  # Green
 
         except:
-            #no boat data
+            #error in getting boat data
             colour = (0, 1, 3, 0.5)  # blue
             pass 
 
@@ -211,7 +224,9 @@ class BoatGUI(App):
 
 
     def get_average_temp_and_volt(self,boat):
-        # Get average temps and volt for installed batteries
+        """
+        calculates the average temperature and voltage across the boats batteries.
+        """
         total_voltage = 0.0
         total_temperature= 0.0
         num_batteries = 0
@@ -237,7 +252,7 @@ class BoatGUI(App):
 class BoatButton(Button):
     """
     BoatButton(dict_boats,boat, colour)
-    Defines the buttons in the gui. takes a dictionary, a boat ID and colour values as inputs.
+    Defines the buttons in the gui. Takes a dictionary, a boat ID and colour values as inputs.
     """
 
     def __init__(self, dict_boats, boat, colour, **kwargs):
@@ -257,7 +272,7 @@ class BoatButton(Button):
         content = BoxLayout(orientation='vertical', padding=10, spacing=5)
         try:
             for key, value in self.dict_boats[boat].items():
-                if key is not 'Batteries':
+                if key != 'Batteries':
                     label_text = f"{key.capitalize()}: {value}"
                     label = Label(text=label_text)
                     content.add_widget(label)
@@ -286,12 +301,32 @@ class BoatButton(Button):
 
 
 
+def update_gui(dt):
+    global ui
+    boat_list = Goboat.get_boats()
+    boat_dict = Goboat.get_details(boat_list)
+    ui.root.clear_widgets()
+    ui.root.add_widget(BoatGUI(boat_list, boat_dict).build())
+    print('test')
+
+
+
+
 
 if __name__ == '__main__':
     # Testserver on own computer.change user and password input to connect to server.
-    Goboat = DatabaseConnection(user="root",password="zxcv1234",host="127.0.0.1")
+    # Goboat = DatabaseConnection(user="root",password="zxcv1234",host="127.0.0.1")
+
+    Goboat = DatabaseConnection(user="gui_user",password="password",host="192.168.1.10",database="goboatv2")
 
     boat_list = Goboat.get_boats()
     boat_dict = Goboat.get_details(boat_list)
+
     ui=BoatGUI(boat_list, boat_dict)
+    Clock.schedule_interval(update_gui, 60) #Schedules the UI to update every 60 seconds. 
     ui.run()    
+
+
+
+
+

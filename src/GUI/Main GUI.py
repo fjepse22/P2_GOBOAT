@@ -307,7 +307,6 @@ def update_gui(dt):
     boat_dict = Goboat.get_details(boat_list)
     ui.root.clear_widgets()
     ui.root.add_widget(BoatGUI(boat_list, boat_dict).build())
-    print('test')
 
 
 

@@ -65,6 +65,8 @@ class PDraw():
                 self.consumption_over_time.append(int(i[2]) / 3600)
             
             self.factor = 0
+
+        self.consumption_over_time.append("EOF")
     
     def get(self, iter):
         """

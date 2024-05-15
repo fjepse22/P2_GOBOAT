@@ -111,67 +111,73 @@ class SimEnvMgr:
 
         while run != 0:
             
-            #Creating files for updating data
-            self.new_data_pos_lat = {"pos_lat" : Pos.move(self.data_unit.get("pos_lat"), 1)}
-            self.new_data_pos_lon = {"pos_lon" : Pos.move(self.data_unit.get("pos_lon"), 1)}
-            self.new_data_time = {"time" : SimDataLocTime.time()}
-            self.new_data_pdraw = {"p_draw": pd.get(lap_counter)}
-            self.new_data_u_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_1 = {"batt_1" : self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_2 = {"batt_2" : self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_3 = {"batt_3" : self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_4 = {"batt_4" : self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_5 = {"batt_5" : self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_6 = {"batt_6" : self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_7 = {"batt_7" : self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config)}
-            self.new_data_u_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-            self.new_data_t_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-            self.new_data_c_batt_8 = {"batt_8" : self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config)}
-            
-            #Updating data in dicts
-            self.data_unit.update(self.new_data_pos_lat)
-            self.data_unit.update(self.new_data_pos_lon)
-            self.data_unit.update(self.new_data_time)
-            self.data_unit.update(self.new_data_pdraw)
-            self.data_batt_voltage.update(self.new_data_u_batt_1)
-            self.data_batt_temp.update(self.new_data_t_batt_1)
-            self.data_batt_charge.update(self.new_data_c_batt_1)
-            self.data_batt_voltage.update(self.new_data_u_batt_2)
-            self.data_batt_temp.update(self.new_data_t_batt_2)
-            self.data_batt_charge.update(self.new_data_c_batt_2)
-            self.data_batt_voltage.update(self.new_data_u_batt_3)
-            self.data_batt_temp.update(self.new_data_t_batt_3)
-            self.data_batt_charge.update(self.new_data_c_batt_3)
-            self.data_batt_voltage.update(self.new_data_u_batt_4)
-            self.data_batt_temp.update(self.new_data_t_batt_4)
-            self.data_batt_charge.update(self.new_data_c_batt_4)
-            self.data_batt_voltage.update(self.new_data_u_batt_5)
-            self.data_batt_temp.update(self.new_data_t_batt_5)
-            self.data_batt_charge.update(self.new_data_c_batt_5)
-            self.data_batt_voltage.update(self.new_data_u_batt_6)
-            self.data_batt_temp.update(self.new_data_t_batt_6)
-            self.data_batt_charge.update(self.new_data_c_batt_6)
-            self.data_batt_voltage.update(self.new_data_u_batt_7)
-            self.data_batt_temp.update(self.new_data_t_batt_7)
-            self.data_batt_charge.update(self.new_data_c_batt_7)
-            self.data_batt_voltage.update(self.new_data_u_batt_8)
-            self.data_batt_temp.update(self.new_data_t_batt_8)
-            self.data_batt_charge.update(self.new_data_c_batt_8)
-            
-            #Updating execution data and mannaging timing
-            lap_counter += 1
-            time.sleep(1/t_scale)
-            print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+            #Check if end of simulation is reached
+            if pd.get(lap_counter) == "EOF":
+                print("Simulation concluded successfully!")
+                return 0
+            else:
+
+                #Creating files for updating data
+                self.new_data_pos_lat = {"pos_lat" : Pos.move(self.data_unit.get("pos_lat"), 1)}
+                self.new_data_pos_lon = {"pos_lon" : Pos.move(self.data_unit.get("pos_lon"), 1)}
+                self.new_data_time = {"time" : SimDataLocTime.time()}
+                self.new_data_pdraw = {"p_draw": pd.get(lap_counter)}
+                self.new_data_u_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_1 = {"batt_1" : self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_2 = {"batt_2" : self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_3 = {"batt_3" : self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_4 = {"batt_4" : self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_5 = {"batt_5" : self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_6 = {"batt_6" : self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_7 = {"batt_7" : self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
+                self.new_data_t_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
+                self.new_data_c_batt_8 = {"batt_8" : self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config)}
+                
+                #Updating data in dicts
+                self.data_unit.update(self.new_data_pos_lat)
+                self.data_unit.update(self.new_data_pos_lon)
+                self.data_unit.update(self.new_data_time)
+                self.data_unit.update(self.new_data_pdraw)
+                self.data_batt_voltage.update(self.new_data_u_batt_1)
+                self.data_batt_temp.update(self.new_data_t_batt_1)
+                self.data_batt_charge.update(self.new_data_c_batt_1)
+                self.data_batt_voltage.update(self.new_data_u_batt_2)
+                self.data_batt_temp.update(self.new_data_t_batt_2)
+                self.data_batt_charge.update(self.new_data_c_batt_2)
+                self.data_batt_voltage.update(self.new_data_u_batt_3)
+                self.data_batt_temp.update(self.new_data_t_batt_3)
+                self.data_batt_charge.update(self.new_data_c_batt_3)
+                self.data_batt_voltage.update(self.new_data_u_batt_4)
+                self.data_batt_temp.update(self.new_data_t_batt_4)
+                self.data_batt_charge.update(self.new_data_c_batt_4)
+                self.data_batt_voltage.update(self.new_data_u_batt_5)
+                self.data_batt_temp.update(self.new_data_t_batt_5)
+                self.data_batt_charge.update(self.new_data_c_batt_5)
+                self.data_batt_voltage.update(self.new_data_u_batt_6)
+                self.data_batt_temp.update(self.new_data_t_batt_6)
+                self.data_batt_charge.update(self.new_data_c_batt_6)
+                self.data_batt_voltage.update(self.new_data_u_batt_7)
+                self.data_batt_temp.update(self.new_data_t_batt_7)
+                self.data_batt_charge.update(self.new_data_c_batt_7)
+                self.data_batt_voltage.update(self.new_data_u_batt_8)
+                self.data_batt_temp.update(self.new_data_t_batt_8)
+                self.data_batt_charge.update(self.new_data_c_batt_8)
+                
+                #Updating execution data and mannaging timing
+                lap_counter += 1
+                time.sleep(1/t_scale)
+                print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)

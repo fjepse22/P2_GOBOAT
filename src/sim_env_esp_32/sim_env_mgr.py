@@ -2,7 +2,7 @@
 # Created by: Jesper Hammer
 # Date: 01-05-2024
 # Modified by: Ib Leminen Mohr Nielsen
-# Last Modified: 10-05-2024
+# Last Modified: 15-05-2024
 
 import time
 from parser_csv_dict import CSVDictParser
@@ -167,14 +167,14 @@ class SimEnvMgr:
         \n
         ------------
         PARAMETERS\n
-        unit_dict\n
-        voltage_dict\n
-        temp_dict\n
+        unit_dict: Dictionary for storing unit data\n
+        voltage_dict: Dictionary for storing battery voltage data\n
+        temp_dict: Dictionary for storing battery temperture data\n
         \n
         ------------
         RETURNS\n
-        TBD!!!\n
+        Returns None\n
         \n
         """
-        client=Client()
-        client.send_data(unit_dict, voltage_dict, temp_dict) #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  
+        client=Client(unit_dict, voltage_dict, temp_dict)
+        client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  

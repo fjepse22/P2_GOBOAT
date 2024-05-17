@@ -130,8 +130,7 @@ class DatabaseConnection:
         # This logic insert the data about voltage for each battery
         # unforfunally it does not work to write the sql statement as a variable and call that varible in the cursor.execute command.
         # Therefore this string is copied to the cursor.execute() command
-        
-        # Inserts the 
+
         try:
             for i in range(0,len(voltage_array)):
                 cursor.execute(f""" INSERT INTO goboatv2.battery_log (Data_ID,bat_ID,temperature,voltage)

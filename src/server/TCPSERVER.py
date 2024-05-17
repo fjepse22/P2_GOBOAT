@@ -1,19 +1,15 @@
-#Version 1.01 | Encoding UTF-8
+#Version 1.02 | Encoding UTF-8
 #Created 23-04-2024
 #Created by: Ib Leminen Mohr Nielsen
 #Modified by: Frederik B. B. Jepsen, Ib Leminen Mohr Nielsen
-#Last modified 14-05-2024
+#Last modified 15-05-2024
 
 import socket
 import selectors
-from logger import log
-from xml_parser import XmlParser
 import time
+from logger import log
 import sql_insert_data as sql
-
-"""
-This needs to be event based with a que system, in order to ensure that all data gets into the database
-"""
+from xml_parser import XmlParser
 
 class SQL_socket:
     """
@@ -25,11 +21,11 @@ class SQL_socket:
     List of class methods:\n
     - __init__(self,HOST='',PORT=9999,CONN_COUNTER=0,BUFFER_SIZE=1024,user= None,password= None,host = None): Initialises the object and starts the process to listen\n
 
-    - __accept(self,sock, mask): Used to establish a connection to a client, that sends a xml-file.\n
+    - __accept_connection(self,sock, mask): Used to establish a connection to a client, that sends a xml-file.\n
 
-    - __read(self, sock, mask): This method is used to recieve the xml-data from a client and insert it into the database\n
+    - __read_data(self, sock, mask): This method is used to recieve the xml-data from a client and insert it into the database\n
 
-    - __insert_data(self,xml):  This method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method. \n
+    - __insert_data(self,xml):  This method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read_data() method. \n
 
     - run(self): This method calls the loop that will constantly listen for something on the specified port self.PORT\n
     """
@@ -56,11 +52,11 @@ class SQL_socket:
         self.sock.bind((self.HOST, self.PORT))
         self.sock.listen(100)
         self.sock.setblocking(False)
-        self.sel.register(self.sock, selectors.EVENT_READ, self.__accept)
+        self.sel.register(self.sock, selectors.EVENT_READ, self.__accept_connection)
 
         #This start the the listening process
 
-    def __accept(self,sock, mask):
+    def __accept_connection(self,sock, mask):
         """
         This private method is used to establish a connection to a client, that sends a xml-file, Should not be run by a user.\n
         \n
@@ -76,15 +72,14 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
+        conn, addr = self.sock.accept() # Should be ready
+        conn.setblocking(False)
+        self.sel.register(conn, selectors.EVENT_READ, self.__read_data)
+    
 
-        self.conn, self.addr = self.sock.accept() # Should be ready
-        self.conn.setblocking(False)
-        self.sel.register(self.conn, selectors.EVENT_READ, self.__read)
-
-
-    def __read(self,sock, mask): 
+    def __read_data(self, conn, mask): 
         """
-        This private method is used to recieve the xml-data from a client and insert it into the SQL-database\n
+        This private method is used to read, recieve and store data\n
         \n
         ------------
         PARAMETERS\n
@@ -98,36 +93,74 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
-        
-        data=b''
-        header = self.conn.recv(3)
+        self.CONN_COUNTER += 1
+        log.debug(f"Connection number {self.CONN_COUNTER} has been established")
+        self.start_time = time.time()
 
+        # Recieves the header max 3 bytes ie ((2^24)-1) length of data
+        header=self.__recieved_data(conn, 3)
+        if header is None:
+            self.sel.unregister(conn)
+            conn.close()
+            log.debug(f"Connection number {self.CONN_COUNTER} has been closed")
+            return
         log.debug(f"header length {int.from_bytes(header, 'big')}")
-        start_time = time.time()
-        while len(data) < int.from_bytes(header, 'big'):
+        
+        # Recieves the data, using the length of the data as buffer size
+        data=self.__recieved_data(conn, int.from_bytes(header, 'big'))
+        if data is None:
+            self.sel.unregister(conn)
+            conn.close()
+            log.debug(f"Connection number {self.CONN_COUNTER} has been closed")
+            return
+        log.debug(f"data length {len(data)}")
+
+        # Creates a XML-file out of the data.
+        self.__insert_data(data)
+
+        # Unregisters the socket and closes the connection
+        self.sel.unregister(conn)
+        conn.close()
+        log.debug(f"Connection number {self.CONN_COUNTER} has been closed")
+        
+    def __recieved_data(self,conn, data_size, timeout=1):
+        """
+        This private method is used to reacieve data\n
+        \n
+        ------------
+        PARAMETERS\n
+        conn: Used for connecting to client.\n
+        data_size: Legth of incomming message.\n
+        timeout: Specified timeout for while loop if it doesnt close.\n
+    
+        self:\n
+        ------------
+        RETURNS\n
+        \n
+        Returns "data": The incomming data from a client\n
+        Return type Bytes\n
+        """
+        data = b''
+        while len(data) < data_size:
             try:
-                data += self.conn.recv(int.from_bytes(header, 'big'))
+                current_data = conn.recv(data_size-len(data))
+                if not current_data:
+                    log.error(f"Connection closed by client")
+                    return None
+                data += current_data
             except BlockingIOError:
                 continue
-            
-            if time.time() - start_time > 1:
-                break
-            
-        log.debug(f"Data length {len(data)}")
-
-        self.sel.unregister(self.conn)
-        self.conn.close()
-        # Creates a XML-file out of the data string and removes the end of file string.
-
-        self.__insert_data(str(data, 'utf-8'))
-        self.CONN_COUNTER +=1
+            if time.time() - self.start_time >= timeout:
+                log.error(f"Timeout as data is not recieved in {timeout}s.")
+                return None
+        return data
 
 
 
 
     def __insert_data(self,xml):
         """
-        This private method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read() method.\n
+        This private method is used to connect to the Goboat database and insert the data from the xml-file, should only be called by the __read_data() method.\n
         \n
         ------------
         PARAMETERS\n
@@ -141,8 +174,13 @@ class SQL_socket:
         Return None\n
         """
         log.info("processing data.....")
+        try:
+            xml=str(xml, 'utf-8')
+        except Exception as e:
+            log.error(f"Error decoding the data: {e}")
+            return
 
-        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_input=str(xml), directory=self.directory) #inserets the xml data into the xml_parser from the client.
+        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), xml_input=xml, directory=self.directory) #inserets the xml data into the xml_parser from the client.
 
         xml_parser.get_all_data()
         

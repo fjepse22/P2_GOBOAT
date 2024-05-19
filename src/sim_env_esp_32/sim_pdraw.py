@@ -1,9 +1,10 @@
-# Version 1.06 | Encoding UFT-8
+# Version 1.07 | Encoding UFT-8
 # Created by: Maiken Hammer
 # Date: 27-04-2024
 # Modified by: Jesper Hammer
 # Date: 04/05-2024
 
+from parser_csv_lst import CSVLstParser
 from validator_csv import ValidatorCSV
 from logger import Logger
 
@@ -37,22 +38,20 @@ class SimPDraw():
         """
 
         self.log = Logger(__name__, log_file)
+        self.parser = CSVLstParser(log_file)
         self.profile = []
-        delim = ','
         self.factor = 0
         self.consumption_over_time = []
 
         #Validates the configuration against its corresponding schema
         try:
-            assert ValidatorCSV.validate(sch_file, file)
+            assert ValidatorCSV.validate(file, sch_file)
 
         except Exception as e:
             self.log.critical(f"VALUE ERROR in CONSUMER CONFIG file: {e}")
 
         #Opens and parses file obj to list
-        with open(file,'r') as file:
-            for line in file:
-                self.profile.append(line.rstrip('\n').rstrip('\r').split(delim))
+        self.profile = self.parser.csv_lst_parser(file)
 
         #Resolves power consumption over time list
         for i in self.profile:
@@ -86,7 +85,7 @@ class SimPDraw():
         \n
         """
 
-        self.log.info("PDraw.get running")
+        self.log.debug("Fetching actual consumption")
         try:
             return self.consumption_over_time[iter]
         

@@ -1,6 +1,8 @@
-# Version 1.01 | Encoding UFT-8
+# Version 1.02 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 05-05-2024
+
+from parser_csv_lst import CSVLstParser
 
 class ValidatorCSV:
     """
@@ -52,6 +54,8 @@ class ValidatorCSV:
                 sch[0][i] = str("str")
             if str(sch[0][i]) == "int":
                 sch[0][i] = int(1)
+            if str(sch[0][i]) == "float":
+                sch[0][i] = float(0.1)
 
         #Validates csv against validation rules
         for i in range(len(reader)):
@@ -60,7 +64,7 @@ class ValidatorCSV:
                     reader[i][j] == int(reader[i][j])
                 except ValueError:
                     pass
-                
+
                 if type(reader[i][j]) == type(sch[0][j]):
                     return_val = bool(True)
                 elif type(reader[i][j]) != type(sch[0][j]):

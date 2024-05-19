@@ -1,10 +1,11 @@
-# Version 1.06 | Encoding UFT-8
+# Version 1.07 | Encoding UFT-8
 # Created by: Maiken Hammer
 # Date: 02-05-2024
 
-from parser_csv_dict import CSVDictParser
-from logger import Logger
 import random 
+from parser_csv_dict import CSVDictParser
+from validator_csv import ValidatorCSV
+from logger import Logger
 
 class SimBatt():
     """
@@ -13,7 +14,7 @@ class SimBatt():
     - batt:get: gets current terminal voltage and a random temperature\n
     """
 
-    def __init__(self, log_file:str, file:str) -> None:
+    def __init__(self, log_file:str, file:str, sch_file:str) -> None:
         """
         Initialises the class\n
         \n
@@ -32,9 +33,18 @@ class SimBatt():
         """
 
         self.log = Logger(__name__, log_file)
+
+        #Validates the configuration against its corresponding schema
+        try:
+            assert ValidatorCSV.validate(file, sch_file)
+
+        except Exception as e:
+            self.log.critical(f"VALUE ERROR in CONSUMER CONFIG file: {e}")
+
         parser = CSVDictParser(log_file)
         self.batt_def = parser.csv_dict_parser_float(file)
         self.soc_key  = [key for key in self.batt_def]
+        print(self.batt_def)
     
     def batt_get(self, charge:float) -> float:
         """
@@ -54,7 +64,7 @@ class SimBatt():
         \n
         """
 
-        self.log.info("batt_get started")
+        self.log.debug("Fetching actual terminal voltage and battery temperature")
 
         try:
             self.temp = random.randint(40,42)

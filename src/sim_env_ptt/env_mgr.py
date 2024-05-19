@@ -1,4 +1,4 @@
-# Version 1.07 | Encoding UFT-8
+# Version 1.08 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 01-05-2024
 
@@ -33,10 +33,10 @@ class EnvMgr:
         """
 
         initialisation_log = "log.txt"
+        self.log.clear_log()
         self.parser = CSVDictParser(initialisation_log)
         self.xml_parser = XMLDictParser(initialisation_log)
         self.log = Logger(__name__, initialisation_log)
-        self.log.clear_log()
         self.settings = self.xml_parser.xml_dict_parser_str("setting_sim_env.xml")
         try:
             self.batt_config = int(self.settings.get("total_number_of_batteries")) * \

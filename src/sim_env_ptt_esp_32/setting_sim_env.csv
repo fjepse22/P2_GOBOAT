@@ -1,0 +1,9 @@
+unit_id,1
+time_scale,1
+total_number_of_batteries,8
+parallel_configuration,1/2
+config_file_battery,config_soc_generic_lead_acid.csv
+config_file_consumer,config_consumer.csv
+schema_file_consumer,sch_config_consumer.csv
+schema_file_battery,sch_config_battery.csv
+log_file,log.txt

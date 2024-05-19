@@ -1,4 +1,4 @@
-# Version 1.00 | Encoding UFT-8
+# Version 1.01 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 02-05-2024
 
@@ -6,7 +6,7 @@
 """
 Main file for collective execution af simulation enviroment
 """
-from sim_env_mgr import SimEnvMgr
+from env_mgr import EnvMgr
 
-sim = SimEnvMgr()
+sim = EnvMgr()
 sim.run_sim()

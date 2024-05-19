@@ -6,7 +6,7 @@
 """
 Main file for collective execution af simulation enviroment
 """
-from sim_env_mgr import SimEnvMgr
+from env_mgr import EnvMgr
 
-sim = SimEnvMgr()
+sim = EnvMgr()
 sim.run_sim()

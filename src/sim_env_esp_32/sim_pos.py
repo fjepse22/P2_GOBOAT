@@ -1,4 +1,4 @@
-# Version 1.00 | Encoding UTF_8
+# Version 1.06 | Encoding UTF_8
 # Created by : Maiken Lanng
 # Date: 27-04-2024
 

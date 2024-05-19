@@ -1,4 +1,4 @@
-# Version 1.01 | Encoding UFT-8
+# Version 1.06 | Encoding UFT-8
 # Created by: Maiken Hammer
 # Date: 27-04-2024
 # Modified by: Ib Leminen Mohr Nielsen

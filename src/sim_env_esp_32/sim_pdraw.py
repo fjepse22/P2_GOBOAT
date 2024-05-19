@@ -70,7 +70,7 @@ class SimPDraw():
 
         self.consumption_over_time.append("EOF")
     
-    def get(self, iter):
+    def get(self, iter:int) -> int:
         """
         Gets current terminal consumption in Watts\n
         \n

@@ -1,4 +1,4 @@
-# Version 1.00 | Encoding UFT-8
+# Version 1.07 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 01-05-2024
 
@@ -10,7 +10,7 @@ from sim_loc_time import SimLocTime
 from sim_pdraw import SimPDraw
 from sim_batt import SimBatt
 from logger import Logger
-import xml.etree.ElementTree as ET
+#import xml.etree.ElementTree as ET
 
 class EnvMgr:
     """

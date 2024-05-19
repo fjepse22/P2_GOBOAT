@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=exec
 User=Gruppe250
-ExecStart=/usr/bin/python3 -u /home/Gruppe250/test/thread_manager.py
+ExecStart=/usr/bin/python3 -u /home/Gruppe250/Server/TCPSERVER.py
 Restart=always
-RestartSec=1s
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

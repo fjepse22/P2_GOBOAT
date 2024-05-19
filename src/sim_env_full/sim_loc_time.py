@@ -16,7 +16,7 @@ class SimLocTime():
         pass
 
     @staticmethod
-    def time():
+    def time() -> str:
 
         """
         Returns the current time\n

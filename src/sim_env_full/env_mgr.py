@@ -35,16 +35,16 @@ class EnvMgr:
         """
 
         initialisation_log = "log.txt"
-        self.log.clear_log()
         self.parser = CSVDictParser(initialisation_log)
         self.xml_parser = XMLDictParser(initialisation_log)
         self.log = Logger(__name__, initialisation_log)
+        self.log.clear_log()
         self.settings = self.xml_parser.xml_dict_parser_str("setting_sim_env.xml")
         try:
             self.batt_config = int(self.settings.get("total_number_of_batteries")) * \
                                                         (int(self.settings.get("parallel_configuration")[0])/int(self.settings.get("parallel_configuration")[2]))
-            self.data_batt_def = self.settings.get("config_file_battery")
-            self.batt_def = self.parser.csv_dict_parser_float(self.data_batt_def)
+            self.data_batt_def = self.settings.get("config_file_battery"), self.settings.get("schema_file_battery")
+            self.batt_def = self.parser.csv_dict_parser_float(self.data_batt_def[0])
             self.soc_key = [key for key in self.batt_def]
             #Dict for storing unit data for transmission during collection
             self.data_unit = {"id" : self.settings.get("unit_id"), "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : 0, "p_draw" : 0}
@@ -97,14 +97,14 @@ class EnvMgr:
 
         #Instantiation of battery and consumer classes
         try:
-            batt_1 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_2 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_3 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_4 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_5 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_6 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_7 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_8 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_1 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_2 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_3 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_4 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_5 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_6 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_7 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_8 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
             pd = SimPDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
         except Exception as e:
             self.log.critical(f"An error occurred whilie instantiating: {e}")

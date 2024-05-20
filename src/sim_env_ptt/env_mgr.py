@@ -33,10 +33,10 @@ class EnvMgr:
         """
 
         initialisation_log = "log.txt"
-        self.log.clear_log()
         self.parser = CSVDictParser(initialisation_log)
         self.xml_parser = XMLDictParser(initialisation_log)
         self.log = Logger(__name__, initialisation_log)
+        self.log.clear_log()
         self.settings = self.xml_parser.xml_dict_parser_str("setting_sim_env.xml")
         try:
             self.batt_config = int(self.settings.get("total_number_of_batteries")) * \
@@ -122,4 +122,4 @@ class EnvMgr:
             
             #Updating execution data and mannaging timing
             time.sleep(1/t_scale)
-            print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+            #print(self.data_unit, self.data_batt_voltage, self.data_batt_temp)

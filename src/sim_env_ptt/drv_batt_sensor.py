@@ -16,7 +16,7 @@ class DRVBattSensor:
     - get: fetches data from hardware(battery sensors)\n
     """
 
-    def __init__(self, log_file) -> None:
+    def __init__(self, log_file:str) -> None:
         """
         Initialises the class and sets op configuration\n
         \n

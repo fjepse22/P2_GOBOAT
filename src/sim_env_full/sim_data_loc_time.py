@@ -32,5 +32,5 @@ class SimDataLocTime():
         Returns a string of times\n
         Return type is string\n
         """
-
-        return f"{time.localtime()[2]}/{time.localtime()[1]}-{time.localtime()[0]} {time.localtime()[3]}:{time.localtime()[4]}:{ time.localtime()[5]}"
+        local_time = time.ctime(time.time())
+        return local_time[11:-5]

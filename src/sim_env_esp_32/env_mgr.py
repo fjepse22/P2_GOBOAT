@@ -10,7 +10,7 @@ from sim_pos import SimPos
 from sim_loc_time import SimLocTime
 from sim_pdraw import SimPDraw
 from sim_batt import SimBatt
-#from esp_tcpclient import Client
+from esp_tcpclient import Client
 from logger import Logger
 
 class EnvMgr:
@@ -165,7 +165,7 @@ class EnvMgr:
                 lap_counter += 1
                 time.sleep(1/t_scale)
                 self.send_data(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
-                print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+                #print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
     
     def send_data(self, unit_dict, voltage_dict, temp_dict):
         """
@@ -182,5 +182,5 @@ class EnvMgr:
         Returns None\n
         \n
         """
-        #client=Client(unit_dict, voltage_dict, temp_dict)
-        #client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  
+        client=Client(unit_dict, voltage_dict, temp_dict)
+        client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  

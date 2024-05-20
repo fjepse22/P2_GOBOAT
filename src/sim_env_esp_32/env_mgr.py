@@ -10,7 +10,7 @@ from sim_pos import SimPos
 from sim_loc_time import SimLocTime
 from sim_pdraw import SimPDraw
 from sim_batt import SimBatt
-from esp_tcpclient import Client
+#from esp_tcpclient import Client
 from logger import Logger
 
 class EnvMgr:
@@ -36,15 +36,15 @@ class EnvMgr:
         """
 
         initialisation_log = "log.txt"
-        self.log.clear_log()
         self.parser = CSVDictParser(initialisation_log)
         self.log = Logger(__name__, initialisation_log)
+        self.log.clear_log()
         self.settings = self.parser.csv_dict_parser_str("setting_sim_env.csv")
         try:
             self.batt_config = int(self.settings.get("total_number_of_batteries")) * \
                                                         (int(self.settings.get("parallel_configuration")[0])/int(self.settings.get("parallel_configuration")[2]))
-            self.data_batt_def = self.settings.get("config_file_battery")
-            self.batt_def = self.parser.csv_dict_parser_float(self.data_batt_def)
+            self.data_batt_def = self.settings.get("config_file_battery"), self.settings.get("schema_file_battery")
+            self.batt_def = self.parser.csv_dict_parser_float(self.data_batt_def[0])
             self.soc_key  = [key for key in self.batt_def]
             #Dict for storing unit data for transmission during collection
             self.data_unit = {"id" : self.settings.get("unit_id"), "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : 0, "p_draw" : 0}
@@ -81,14 +81,14 @@ class EnvMgr:
 
         #Instantiation of battery and consumer classes
         try:
-            batt_1 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_2 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_3 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_4 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_5 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_6 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_7 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
-            batt_8 = SimBatt(self.settings.get("log_file"), self.data_batt_def)
+            batt_1 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_2 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_3 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_4 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_5 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_6 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_7 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
+            batt_8 = SimBatt(self.settings.get("log_file"), self.data_batt_def[0], self.data_batt_def[1])
             pd = SimPDraw(self.settings.get("log_file"), self.settings.get("config_file_consumer"),self.settings.get("schema_file_consumer"))
         except Exception as e:
             self.log.critical(f"An error occurred whilie instantiating: {e}")
@@ -165,7 +165,7 @@ class EnvMgr:
                 lap_counter += 1
                 time.sleep(1/t_scale)
                 self.send_data(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
-                #print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
+                print(self.data_unit, self.data_batt_voltage, self.data_batt_temp, self.data_batt_charge)
     
     def send_data(self, unit_dict, voltage_dict, temp_dict):
         """
@@ -182,5 +182,5 @@ class EnvMgr:
         Returns None\n
         \n
         """
-        client=Client(unit_dict, voltage_dict, temp_dict)
-        client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  
+        #client=Client(unit_dict, voltage_dict, temp_dict)
+        #client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  

@@ -44,8 +44,7 @@ class SimBatt():
         parser = CSVDictParser(log_file)
         self.batt_def = parser.csv_dict_parser_float(file)
         self.soc_key  = [key for key in self.batt_def]
-        print(self.batt_def)
-    
+        
     def batt_get(self, charge:float) -> float:
         """
         Gets current terminal voltage and a random temperature\n

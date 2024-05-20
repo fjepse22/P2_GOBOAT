@@ -143,7 +143,7 @@ class SQL_socket:
         data = b''
         while len(data) < data_size:
             try:
-                current_data = conn.recv(data_size-len(data))
+                current_data = conn.recv(data_size)
                 if not current_data:
                     log.error(f"Connection closed by client")
                     return None

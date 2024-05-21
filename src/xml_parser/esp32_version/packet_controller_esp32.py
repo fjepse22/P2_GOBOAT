@@ -5,12 +5,18 @@
 #Last modified 13-05-2024
 
 from lxml import etree
-        
-def validate(xsd_path: str, xml_input: str) -> bool:
-    xmlschema_doc = etree.parse(xsd_path)
-    xmlschema = etree.XMLSchema(xmlschema_doc)
-    
-    xml_doc= etree.fromstring(xml_input)
-    result = xmlschema.validate(xml_doc)
+class PacketController():
+    """
+    The class PacketController is used to validate the XML file against the XSD file\n
+    """
+    def __init__(self):
+        pass
 
-    return result
+    def validate(self, xsd_path: str, xml_input: str) -> bool:
+        xmlschema_doc = etree.parse(xsd_path)
+        xmlschema = etree.XMLSchema(xmlschema_doc)
+        
+        xml_doc= etree.fromstring(xml_input)
+        result = xmlschema.validate(xml_doc)
+
+        return result

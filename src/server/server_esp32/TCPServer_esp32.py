@@ -6,7 +6,6 @@
 
 import socket
 import selectors
-import json
 import time
 from logger import log
 import sql_insert_data as sql
@@ -144,7 +143,7 @@ class SQL_socket:
         data = b''
         while len(data) < data_size:
             try:
-                current_data = conn.recv(data_size)
+                current_data = conn.recv(data_size-len(data))
                 if not current_data:
                     log.error(f"Connection closed by client")
                     return None
@@ -171,19 +170,8 @@ class SQL_socket:
         Returns "None"\n
         Return None\n
         """
-        log.info("processing data.....")
-        try:
-            data=data.split(b'#')
-            unit_dict=json.loads(data[0].decode('utf-8'))
-            voltage_dict=json.loads(data[1].decode('utf-8'))
-            temp_dict=json.loads(data[2].decode('utf-8'))  
-        
-        except (json.decoder.JSONDecodeError, IndexError, TypeError, UnicodeDecodeError) as e:
-                log.error(f"""File: TCPSERVER.py: {e}""")
-                return
-    
-        log.debug(f"Data is being converted into original input")
-        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, unit_dict = unit_dict, voltage_dict=voltage_dict, temp_dict=temp_dict) #inserets the xml data into the xml_parser from the client.
+        log.info("processing data.....")    
+        xml_parser= XmlParser(xsd_path=(self.directory+"/sch_status_data.xsd"), directory=self.directory, data=data) #inserets the xml data into the xml_parser from the client.
         xml_parser.get_all_data()
 
         if xml_parser.valid_xml == True:

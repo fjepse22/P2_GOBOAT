@@ -64,15 +64,20 @@ if __name__ == "__main__":
     unit_dict = {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : local_time[11:-5], "p_draw" : 1}
     voltage_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
     temp_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
-
     # some inputs used for testing stability of server
-    input_list=["hello", 1, ["hello", "hello", "hello"], None, True, {"t":1}]
+    #input_list=["hello", 1, ["hello", "hello", "hello"], None, True, {"t":1}]
     #for i in range(0, len(input_list)):
         #client = TCPClient()
         #client.payload(unit_dict, voltage_dict, temp_dict, nbytes=3, message=input_list[i])
     
     #client = TCPClient()
-    for i in range(10):
+    for i in range(1):
+        local_time = time.ctime(time.time())
+    
+        unit_dict = {"id" : 1, "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : local_time[11:-5], "p_draw" : 1}
+        voltage_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+        temp_dict = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+
         client = TCPClient()
         client.payload(unit_dict, voltage_dict, temp_dict, nbytes=3, server_ip="192.168.1.10", server_port=8888)# Change the IP to the IP of the server
 

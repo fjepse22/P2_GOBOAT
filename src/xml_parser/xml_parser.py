@@ -5,10 +5,9 @@
 #Last modified 13-05-2024
 
 import xml.etree.ElementTree as ET
-import logging
 from logger import log
 from datetime import datetime
-from packet_controller import validate
+from packet_controller import PacketController
 
 class XmlParser:
     """
@@ -35,9 +34,9 @@ class XmlParser:
         self.lok_long = float(0)  #Longitude used to locate the boat. 
         self.date = str("")  #yyyy-mm-dd hh:mm:ss format 
         self.boat_id = str("")  #Uniqe ID for each boat.
-        self.read_xml((xsd_path), xml_input) #Reads the XML file and stores it in self.root
+        self.read_xml(xsd_path, xml_input) #Reads the XML file and stores it in self.root
         
-    def read_xml(self,xsd_path,xml_input):
+    def read_xml(self, xsd_path, xml_input):
         """
         Reads the XML file and stores it in self.root\n
         The XML-file can eithe be found via a file directory or recieved via xml\n
@@ -65,14 +64,15 @@ class XmlParser:
             try:
                 try:
                     self.root = ET.fromstring(open(xml_input).read()) #Reads the XML file and stores it in root.
-                # if xml_input is not a path but a string, the program wil read the string as an xml-file.
+                    # if xml_input is not a path but a string, the program wil read the string as an xml-file.
                 except:
                     self.root = ET.fromstring(xml_input) #Reads the XML data and stores it in root.
-            except ET.ParseError:
-                log.error(f"""File: xml_parser.py: ErrorType: ET.ParseError\nThe string is not in XML format""")
+            except ET.ParseError as e:
+                log.error(f"""File: xml_parser.py: {e}""")
                 self.valid_xml=False
-
-            if self.valid_xml==True and not validate(xsd_path,xml_input):
+            
+            
+            if self.valid_xml==True and not PacketController().validate(xsd_path, xml_input,):
                 log.error(f"""File: packet_controller.py: The XML file is not valid according to the XSD schema""")
                 self.valid_xml=False
          
@@ -189,6 +189,6 @@ class XmlParser:
         """)
 
 if __name__ == '__main__':
-    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/rasp/",) #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
+    xml_parser= XmlParser(directory="/Users/ibleminen/Downloads/test/XML_VERSION/Server XML/xml_parser.py") #if you want to change directory, you can add it as a parameter here ex. for macOS XmlParser(directory="/Users/ibleminen/Downloads/test/rasp") 
     xml_parser.get_all_data()
     print(xml_parser)

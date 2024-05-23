@@ -51,8 +51,8 @@ class EnvMgr:
             #Dict for storing unit data for transmission during collection
             self.data_unit = {"id" : self.settings.get("unit_id"), "pos_lat" : 3300000, "pos_lon" : -10400000, "time" : 0, "p_draw" : 0}
             #Dict for storing battery voltage data for transmission during collection
-            self.data_batt_voltage = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, 
-                                        "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
+            self.data_batt_voltage = {"batt_1" : self.batt_def.get(105.0), "batt_2" : self.batt_def.get(105.0), "batt_3" : self.batt_def.get(105.0), "batt_4": self.batt_def.get(105.0), 
+                                    "batt_5": self.batt_def.get(105.0), "batt_6": self.batt_def.get(105.0), "batt_7" : self.batt_def.get(105.0), "batt_8" : self.batt_def.get(105.0)}
             #Dict for storing battery temperature data for transmission during collection
             self.data_batt_temp = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, 
                                     "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
@@ -109,30 +109,30 @@ class EnvMgr:
                 self.new_data_pos_lon = {"pos_lon" : SimPos.move(self.data_unit.get("pos_lon"), 1)}
                 self.new_data_time = {"time" : SimLocTime.time()}
                 self.new_data_pdraw = {"p_draw": pd.get(lap_counter)}
-                self.new_data_u_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_1 = {"batt_1" : self.data_batt_charge.get("batt_1") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_2 = {"batt_2" : self.data_batt_charge.get("batt_2") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_3 = {"batt_3" : self.data_batt_charge.get("batt_3") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_4 = {"batt_4" : self.data_batt_charge.get("batt_4") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_5 = {"batt_5" : self.data_batt_charge.get("batt_5") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_6 = {"batt_6" : self.data_batt_charge.get("batt_6") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_7 = {"batt_7" : self.data_batt_charge.get("batt_7") - (self.data_unit.get("p_draw") / self.batt_config)}
-                self.new_data_u_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[0]}
-                self.new_data_t_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config))[1]}
-                self.new_data_c_batt_8 = {"batt_8" : self.data_batt_charge.get("batt_8") - (self.data_unit.get("p_draw") / self.batt_config)}
+                self.new_data_u_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_1") /self.batt_config)))[0]}
+                self.new_data_t_batt_1 = {"batt_1" : batt_1.batt_get(self.data_batt_charge.get("batt_1") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_1") /self.batt_config)))[1]}
+                self.new_data_c_batt_1 = {"batt_1" : self.data_batt_charge.get("batt_1") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_1") /self.batt_config))}
+                self.new_data_u_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_2") /self.batt_config)))[0]}
+                self.new_data_t_batt_2 = {"batt_2" : batt_2.batt_get(self.data_batt_charge.get("batt_2") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_2") /self.batt_config)))[1]}
+                self.new_data_c_batt_2 = {"batt_2" : self.data_batt_charge.get("batt_2") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_3") /self.batt_config))}
+                self.new_data_u_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_3") /self.batt_config)))[0]}
+                self.new_data_t_batt_3 = {"batt_3" : batt_3.batt_get(self.data_batt_charge.get("batt_3") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_3") /self.batt_config)))[1]}
+                self.new_data_c_batt_3 = {"batt_3" : self.data_batt_charge.get("batt_3") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_3") /self.batt_config))}
+                self.new_data_u_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_4") /self.batt_config)))[0]}
+                self.new_data_t_batt_4 = {"batt_4" : batt_4.batt_get(self.data_batt_charge.get("batt_4") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_4") /self.batt_config)))[1]}
+                self.new_data_c_batt_4 = {"batt_4" : self.data_batt_charge.get("batt_4") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_4") /self.batt_config))}
+                self.new_data_u_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_5") /self.batt_config)))[0]}
+                self.new_data_t_batt_5 = {"batt_5" : batt_5.batt_get(self.data_batt_charge.get("batt_5") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_5") /self.batt_config)))[1]}
+                self.new_data_c_batt_5 = {"batt_5" : self.data_batt_charge.get("batt_5") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_5") /self.batt_config))}
+                self.new_data_u_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_6") /self.batt_config)))[0]}
+                self.new_data_t_batt_6 = {"batt_6" : batt_6.batt_get(self.data_batt_charge.get("batt_6") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_6") /self.batt_config)))[1]}
+                self.new_data_c_batt_6 = {"batt_6" : self.data_batt_charge.get("batt_6") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_6") /self.batt_config))}
+                self.new_data_u_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_7") /self.batt_config)))[0]}
+                self.new_data_t_batt_7 = {"batt_7" : batt_7.batt_get(self.data_batt_charge.get("batt_7") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_7") /self.batt_config)))[1]}
+                self.new_data_c_batt_7 = {"batt_7" : self.data_batt_charge.get("batt_7") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_7") /self.batt_config))}
+                self.new_data_u_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_8") /self.batt_config)))[0]}
+                self.new_data_t_batt_8 = {"batt_8" : batt_8.batt_get(self.data_batt_charge.get("batt_8") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_8") /self.batt_config)))[1]}
+                self.new_data_c_batt_8 = {"batt_8" : self.data_batt_charge.get("batt_8") - ((self.data_unit.get("p_draw") / self.data_batt_voltage.get("batt_8") /self.batt_config))}
                 
                 #Updating data in dicts
                 self.data_unit.update(self.new_data_pos_lat)

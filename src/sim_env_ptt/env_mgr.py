@@ -1,6 +1,9 @@
 # Version 1.08 | Encoding UFT-8
 # Created by: Jesper Hammer
 # Date: 01-05-2024
+# Modified by: Ib Leminen
+# Last modified: 23-05-2024
+
 
 import time
 from parser_csv_dict import CSVDictParser
@@ -8,6 +11,8 @@ from parser_xml_dict import XMLDictParser
 from sim_pos import SimPos
 from sim_loc_time import SimLocTime
 from drv_batt_sensor import DRVBattSensor
+from client import TCPClient
+from generate_xml import GenerateXML
 from logger import Logger
 
 class EnvMgr:
@@ -122,4 +127,27 @@ class EnvMgr:
             
             #Updating execution data and mannaging timing
             time.sleep(1/t_scale)
-            #print(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
+            self.client(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
+             
+
+    def client(self, data_unit, data_batt_voltage, data_batt_temp):
+        """
+        Sends data to network client\n
+        \n
+        ------------
+        PARAMETERS\n
+        data_unit: dictionary with data about the data_unit\n
+        data_batt_voltage: dictionary with data about the battery voltage\n
+        data_batt_temp: dictionary with data about the battery temperture\n
+        \n
+        ------------
+        RETURNS\n
+        Returns None\n
+        \n
+        """
+        generate_xml = GenerateXML()
+        xml = generate_xml.generateXML(data_unit, data_batt_voltage, data_batt_temp)
+        byte_xml = bytes(xml, 'utf-8')
+        client = TCPClient()
+        client.send_data(byte_xml, server_ip="192.168.1.10", server_port=9999, nbytes=3)
+        

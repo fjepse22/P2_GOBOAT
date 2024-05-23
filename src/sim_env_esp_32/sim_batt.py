@@ -65,17 +65,23 @@ class SimBatt():
 
         self.log.debug("Fetching actual terminal voltage and battery temperature")
 
-        try:
-            self.temp = random.randint(40,42)
+        if charge <= self.soc_key[-1]:
+            self.log.error("Battery empty! Ending simulation!")
+            raise "Battery empty! Ending simulation!"
+        
+        else:
 
-            #Determines which interval of SOC the current charge belongs to and returns the highest value of the interval
-            for _ in range(len(self.soc_key ) -1):
-                if charge <= self.soc_key[_] and charge > self.soc_key[_ +1]:
+            try:
+                self.temp = random.randint(40,42)
+
+                #Determines which interval of SOC the current charge belongs to and returns the highest value of the interval
+                for _ in range(len(self.soc_key ) -1):
+                    if charge <= self.soc_key[_] and charge > self.soc_key[_ +1]:
+                        self.return_value = self.batt_def.get(self.soc_key[_])
+                        return self.return_value, float(self.temp)
+                if charge <= self.soc_key[len(self.soc_key)]:
                     self.return_value = self.batt_def.get(self.soc_key[_])
-                    return self.return_value, float(self.temp)
-            if charge <= self.soc_key[len(self.soc_key)]:
-                self.return_value = self.batt_def.get(self.soc_key[_])
 
-            return self.return_value, float(self.temp)
-        except Exception as e:
-            self.log.critical(f"An error occurred while getting battery data: {e}")
+                return self.return_value, float(self.temp)
+            except Exception as e:
+                self.log.critical(f"An error occurred while getting battery data: {e}")

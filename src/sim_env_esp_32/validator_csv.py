@@ -44,8 +44,8 @@ class ValidatorCSV:
             for line in file:
                 reader.append(line.rstrip('\n').rstrip('\r').split(delim))
 
-        with open(sch_file,'r') as file:
-            for line in file:
+        with open(sch_file,'r') as schfile:
+            for line in schfile:
                 sch.append(line.rstrip('\n').rstrip('\r').split(delim))
 
         #Generates list of validation rules based on schema
@@ -57,14 +57,34 @@ class ValidatorCSV:
             if str(sch[0][i]) == "float":
                 sch[0][i] = float(0.1)
 
+        global test
+
+        #Convert file content from STR to intended format
+        for i in range(len(reader)):
+            for j in range(len(reader[i])):
+                test = 0
+                try:
+                    reader[i][j] = int(reader[i][j])
+                except ValueError:
+                    pass
+                else:
+                    test = 1
+                if test == 0:
+                    try:
+                        reader[i][j] = float(reader[i][j])
+                    except ValueError:
+                        pass
+                    else:
+                        test = 1
+                if test == 0:
+                    try:
+                        reader[i][j] = str(reader[i][j])
+                    except ValueError:
+                        pass
+
         #Validates csv against validation rules
         for i in range(len(reader)):
             for j in range(len(reader[i])):
-                try:
-                    reader[i][j] == int(reader[i][j])
-                except ValueError:
-                    pass
-
                 if type(reader[i][j]) == type(sch[0][j]):
                     return_val = bool(True)
                 elif type(reader[i][j]) != type(sch[0][j]):

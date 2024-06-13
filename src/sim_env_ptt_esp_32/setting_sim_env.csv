@@ -1,5 +1,5 @@
 unit_id,1
-time_scale,1
+time_scale,100
 total_number_of_batteries,8
 parallel_configuration,1/2
 config_file_battery,config_soc_generic_lead_acid.csv

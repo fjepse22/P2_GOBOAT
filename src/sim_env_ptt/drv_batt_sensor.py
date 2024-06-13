@@ -66,6 +66,15 @@ class DRVBattSensor:
         \n
         """
 
+        ret_0 = 0
+        ret_1 = 0
+        ret_2 = 0
+        ret_3 = 0
+        ret_4 = 0
+        ret_5 = 0
+        ret_6 = 0
+        ret_7 = 0
+
         self.log.debug("Getting battery data")
         try:
             # create analog input channels

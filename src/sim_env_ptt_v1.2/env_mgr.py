@@ -1,14 +1,18 @@
 # Version 1.08 | Encoding UFT-8
 # Created by: Jesper Hammer
-# Date: 17-05-2024
+# Date: 01-05-2024
+# Modified by: Ib Leminen
+# Last modified: 23-05-2024
 
 
 import time
 from parser_csv_dict import CSVDictParser
+from parser_xml_dict import XMLDictParser
 from sim_pos import SimPos
 from sim_loc_time import SimLocTime
-from drv_batt_sensor import DRVBattSensor
-#from esp_tcpclient import Client
+from drv_batt_sensor import DRVMcp300x
+from client import TCPClient
+from generate_xml import GenerateXML
 from logger import Logger
 
 class EnvMgr:
@@ -35,9 +39,10 @@ class EnvMgr:
 
         initialisation_log = "log.txt"
         self.parser = CSVDictParser(initialisation_log)
+        self.xml_parser = XMLDictParser(initialisation_log)
         self.log = Logger(__name__, initialisation_log)
         self.log.clear_log()
-        self.settings = self.parser.csv_dict_parser_str("setting_sim_env.csv")
+        self.settings = self.xml_parser.xml_dict_parser_str("setting_sim_env.xml")
         try:
             self.batt_config = int(self.settings.get("total_number_of_batteries")) * \
                                                         (int(self.settings.get("parallel_configuration")[0])/int(self.settings.get("parallel_configuration")[2]))
@@ -49,9 +54,24 @@ class EnvMgr:
             #Dict for storing battery temperature data for transmission during collection
             self.data_batt_temp = {"batt_1" : 0, "batt_2" : 0, "batt_3" : 0, "batt_4": 0, 
                                     "batt_5": 0, "batt_6": 0, "batt_7" : 0, "batt_8" : 0}
-
         except Exception as e:
             self.log.critical(f"An error occurred whilie initializing sim_env_mgr: {e}")
+
+    def send_data(self):
+        """
+        Sends data to network client\n
+        \n
+        ------------
+        PARAMETERS\n
+        TBD!!!\n
+        \n
+        ------------
+        RETURNS\n
+        TBD!!!\n
+        \n
+        """
+        pass    
+        #dataTx
 
     def run_sim(self) -> None:
         """
@@ -69,12 +89,11 @@ class EnvMgr:
         
         self.log.info("Sim started")
         t_scale = int(self.settings.get("time_scale"))
-        lap_counter = 0
         run = 1
 
-        #Instantiation of battery and consumer classes
+        #Instantiation of battery sensor driver and battery sensor fetcher
         try:
-            batt = DRVBattSensor(self.settings.get("log_file"))
+            batt = DRVMcp300x()
         except Exception as e:
             self.log.critical(f"An error occurred whilie instantiating: {e}")
 
@@ -107,25 +126,28 @@ class EnvMgr:
             self.data_batt_voltage.update(self.new_data_u_batt_8)
             
             #Updating execution data and mannaging timing
-            lap_counter += 1
             time.sleep(1/t_scale)
-            #self.send_data(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
-            print(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
-    
-    def send_data(self, unit_dict, voltage_dict, temp_dict):
+            self.client(self.data_unit, self.data_batt_voltage, self.data_batt_temp)
+             
+
+    def client(self, data_unit, data_batt_voltage, data_batt_temp):
         """
-        Sends data to network GoBoat server\n
+        Sends data to network client\n
         \n
         ------------
         PARAMETERS\n
-        unit_dict: Dictionary for storing unit data\n
-        voltage_dict: Dictionary for storing battery voltage data\n
-        temp_dict: Dictionary for storing battery temperture data\n
+        data_unit: dictionary with data about the data_unit\n
+        data_batt_voltage: dictionary with data about the battery voltage\n
+        data_batt_temp: dictionary with data about the battery temperture\n
         \n
         ------------
         RETURNS\n
         Returns None\n
         \n
         """
-        #client=Client(unit_dict, voltage_dict, temp_dict)
-        #client.payload() #to change ip adress of server, change to client.send_data(unit_dict, voltage_dict, temp_dict, "new_ip_adress")  
+        generate_xml = GenerateXML()
+        xml = generate_xml.generateXML(data_unit, data_batt_voltage, data_batt_temp)
+        byte_xml = bytes(xml, 'utf-8')
+        client = TCPClient()
+        client.send_data(byte_xml, server_ip="192.168.1.10", server_port=9999, nbytes=3)
+        

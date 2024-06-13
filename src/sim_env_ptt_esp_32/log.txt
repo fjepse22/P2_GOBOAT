@@ -1,0 +1,3 @@
+
+DEBUG : parser_csv_dict : 20/5-2024 21:31:52 : opened setting_sim_env.csv
+INFO : env_mgr : 20/5-2024 21:31:52 : Sim started

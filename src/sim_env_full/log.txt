@@ -1,0 +1,29 @@
+
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+INFO : env_mgr : 29/5-2024 11:3:42 : Sim started
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 29/5-2024 11:3:42 : opened config_soc_generic_lead_acid.csv
+INFO : sim_pdraw : 29/5-2024 11:3:42 : Fetching actual consumption
+INFO : sim_pdraw : 29/5-2024 11:3:42 : Fetching actual consumption
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started
+INFO : sim_batt : 29/5-2024 11:3:42 : batt_get started

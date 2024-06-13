@@ -1,0 +1,84 @@
+
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened setting_sim_env.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+INFO : env_mgr : 24/5-2024 1:11:9 : Sim started
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : parser_csv_dict : 24/5-2024 1:11:9 : opened config_soc_generic_lead_acid.csv
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_pdraw : 24/5-2024 1:11:9 : Fetching actual consumption
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
+DEBUG : sim_batt : 24/5-2024 1:11:9 : Fetching actual terminal voltage and battery temperature
